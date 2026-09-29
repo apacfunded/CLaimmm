@@ -480,6 +480,23 @@ const {
   BaseFeeMode, TokenType, TokenDecimal, TokenAuthorityOption, CollectFeeMode, MigrationOption,
   MigrationFeeOption, MigratedCollectFeeMode, DammV2DynamicFeeMode, ActivationType, SwapMode
 } = DBC;
+// Browser fix: the SDK calls buf.compare(new Uint8Array(...)) when deriving a pool address. The Buffer
+// shim bundled inside web3.js only accepts Buffers there ("Argument must be a Buffer"), so launches failed.
+// Teach every Buffer copy the SDK touches to accept plain Uint8Arrays in compare/equals.
+function patchBufProto(proto){
+  if (!proto || proto.__claimPatched) return;
+  const toBuf = u => (u instanceof Uint8Array && !u._isBuffer) ? Object.setPrototypeOf(new Uint8Array(u), proto) : u;
+  for (const m of ['compare', 'equals']){ const o = proto[m]; if (typeof o === 'function') proto[m] = function(t, ...r){ return o.call(this, toBuf(t), ...r); }; }
+  const C = proto.constructor;
+  if (C && typeof C.compare === 'function'){ const oc = C.compare; C.compare = function(x, y){ return oc.call(this, toBuf(x), toBuf(y)); }; }
+  Object.defineProperty(proto, '__claimPatched', { value: true });
+}
+try {
+  const W3SDK = await import('https://cdn.jsdelivr.net/npm/@solana/web3.js@1.99.0/+esm'); // same copy the SDK imports
+  const k = 'So11111111111111111111111111111111111111112';
+  [W3SDK.PublicKey, PublicKey].forEach(P => patchBufProto(Object.getPrototypeOf(new P(k).toBuffer())));
+  patchBufProto(Buffer.prototype);
+} catch(e){ console.warn('Buffer patch skipped', e); }
 window.__libsReady = true;
 
 // ---------- constants & state ----------
