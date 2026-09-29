@@ -533,6 +533,26 @@ const lpMark = (ins = 0) => ins
   : (safeUrl(SITE.LOGO_URL) ? `<img class="lp-mark" src="${esc(SITE.LOGO_URL)}" alt="${esc(SITE.NAME)}" title="Launched on ${esc(SITE.NAME)}">` : `<span class="lp-mark" title="Launched on ${esc(SITE.NAME)}">${esc(SITE.NAME)}</span>`);
 const ps = p => (p && p.poolState) ? p.poolState : p;   // pool data lives under .poolState in SDK 1.5
 const safeUrl = u => /^https?:\/\//i.test(u || '') ? u : '';
+// Pump.fun-style "liquidity": the SOL the bonding curve prices against (virtual reserve), not only SOL deposited so far.
+// DBC math: quote amount = L * sqrtPrice >> 128 for the active curve segment.
+function curveLiquiditySol(pool, config){
+  const real = Number(ps(pool).quoteReserve.toString()) / 1e9;
+  try {
+    const sp = BigInt(ps(pool).sqrtPrice.toString());
+    const seg = (config.curve || []).find(p => p && p.liquidity && p.sqrtPrice && BigInt(p.liquidity.toString()) > 0n && BigInt(p.sqrtPrice.toString()) > sp);
+    if (!seg) return real;
+    const v = Number((BigInt(seg.liquidity.toString()) * sp) >> 128n) / 1e9;
+    return v > real ? v : real;
+  } catch(e){ return real; }
+}
+let solUsd = 0, solUsdAt = 0;
+async function getSolUsd(){
+  if (solUsd && Date.now() - solUsdAt < 60_000) return solUsd;
+  try { const j = await (await fetch('https://lite-api.jup.ag/price/v3?ids=So11111111111111111111111111111111111111112')).json();
+    const p = Number(j?.So11111111111111111111111111111111111111112?.usdPrice); if (p > 0){ solUsd = p; solUsdAt = Date.now(); } } catch(e){}
+  return solUsd;
+}
+const usd = s => solUsd ? ` <span class="muted">($${fmtNum(s * solUsd)})</span>` : '';
 
 // ---------- wallet ----------
 function getProvider(){ const p = window.phantom?.solana || window.solana; return p?.isPhantom ? p : null; }
@@ -722,6 +742,8 @@ async function openCoin(address){
     const migrated = ps(pool).isMigrated === 1 || progress >= 1;   // curve full = graduated (migration may still be finishing)
     const moving = progress >= 1 && ps(pool).isMigrated !== 1;
     const ins = levelOfConfig(configAddr) ?? 0;
+    await getSolUsd();
+    const liq = migrated ? Number(ps(pool).quoteReserve.toString()) / 1e9 : curveLiquiditySol(pool, config);
     current = { address, pool, config, mint, meta, ins, migrated };
     location.hash = 'coin=' + address;
 
@@ -740,7 +762,8 @@ async function openCoin(address){
         <div class="card">
           <h2>Stats</h2>
           <div class="stat"><span>Price</span><b>${Number(price.toString()).toPrecision(4)} SOL</b></div>
-          <div class="stat"><span>Market cap</span><b>${fmtNum(Number(price.mul(SUPPLY).toString()))} SOL</b></div>
+          <div class="stat"><span>Market cap</span><b>${fmtNum(Number(price.mul(SUPPLY).toString()))} SOL${usd(Number(price.mul(SUPPLY).toString()))}</b></div>
+          <div class="stat" title="Like pump.fun: the SOL the bonding curve trades against, including its built-in starting liquidity"><span>Liquidity</span><b>${fmtNum(liq)} SOL${usd(liq)}</b></div>
           <div class="stat"><span>SOL in curve</span><b>${sol(ps(pool).quoteReserve.toString(), 3)} / ${sol(config.migrationQuoteThreshold.toString(), 1)}</b></div>
           <div class="stat"><span>Graduation</span><b>${(progress * 100).toFixed(1)}%</b></div>
           <div class="bar"><i style="width:${(progress * 100).toFixed(1)}%"></i></div>
