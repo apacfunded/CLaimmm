@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>insured</title>
+<title>covered</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 <script>
@@ -12,7 +12,7 @@
    The Admin tab fills most of this in for you after setup.
    ============================================================ */
 window.SITE = {
-  NAME: 'insured',
+  NAME: 'covered',
   // Your site's address and logo (square PNG/JPG URL). Shown on every coin and registered on-chain from Admin.
   WEBSITE: 'https://claimpad.lol',
   LOGO_URL: 'https://gateway.pinata.cloud/ipfs/bafkreia7mlsaq3c5wjknxlwykqknihpwbdtq67fhhbi5qntdsl33kymrem',
@@ -23,14 +23,14 @@ window.SITE = {
   // Pinata JWT used for coin images. Use a key limited to file uploads only — it is visible to visitors.
   PINATA_JWT: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiIyNTA0ZDI1Ni1hYmRmLTRmMDAtYTdhMS1kMTZiMTdmYWFmOTgiLCJlbWFpbCI6ImFwYWNmdW5kZWRAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsInBpbl9wb2xpY3kiOnsicmVnaW9ucyI6W3siZGVzaXJlZFJlcGxpY2F0aW9uQ291bnQiOjEsImlkIjoiRlJBMSJ9LHsiZGVzaXJlZFJlcGxpY2F0aW9uQ291bnQiOjEsImlkIjoiTllDMSJ9XSwidmVyc2lvbiI6MX0sIm1mYV9lbmFibGVkIjpmYWxzZSwic3RhdHVzIjoiQUNUSVZFIn0sImF1dGhlbnRpY2F0aW9uVHlwZSI6InNjb3BlZEtleSIsInNjb3BlZEtleUtleSI6IjU2YTczMzg0MWYxMWM4NjdmNDkzIiwic2NvcGVkS2V5U2VjcmV0IjoiMTI1YTgyMzBlZWYwMzNjNmYzMzcwOTNiZmViNzIzM2IxYzM3MzhjMDA5ZmRiOTFlNDA2MTRhMDRkNDNiMDkyNCIsImV4cCI6MTgyMjEwNDk0Mn0.a8DmB5JsYHLDaj7Oj3xh6utyvCwSNFVo3eD01xeJaLw',
   // What you keep from every trade, after Meteora's cut.
-  NET_PLATFORM_FEE_PCT: 1.25,   // 1% to you + 0.25% to $INSURED buyback & burn
+  NET_PLATFORM_FEE_PCT: 1.25,   // 1% to you + 0.25% to $COVERED buyback & burn
   // Filled in by Admin → Setup. One fee config per insurance level (0 = no insurance).
   CONFIGS: { 0: '4w4TGnMdync9foqUeCuqgW4o5fst62SDDTMhRKiRXtVS', 1: 'F7mEVHMkU7GivdPemv2myuPyTsJ2NzxszCi8RKSP1zeA', 2: '2CSMfYoxS2HTNrtAAW9beCgZt98nWy8o4UjCS9YkCi95', 3: 'EsHiLiVoSGPzsfDRi9TeQrbCDAZQZUiheKwxJuft1LZb', 4: '4N91EcAxEaP2JRq2ULVUYwcNZgSbE5eAbtrW8nvppvRY', 5: 'Epq9KpGDgUqkJDd3CqkBu5uHVpEEsCH5Cyppw5sGuoPh' },
   // Anti-snipe versions (Admin → Setup → Create anti-snipe configs): 50% fee at launch, falling to normal over 60 seconds.
   CONFIGS_AS: { 0: '', 1: '', 2: '', 3: '', 4: '', 5: '' },
   // Buy back & burn: your main coin's mint address, and what share of YOUR platform fees goes to buybacks.
-  CLAIM_MINT: '2TqQDESbLKFqkBkk9jkrZZ2ZErixthToitHPasxHpump',
-  CLAIM_TICKER: 'INSURED',
+  CLAIM_MINT: '',
+  CLAIM_TICKER: 'COVERED',
   CLAIM_START_SUPPLY: 1000000000,
   BUYBACK_PCT: 20,              // share of the platform fee used for buyback & burn (20% of 1.25% = 0.25% of every trade)
   // Wallet that holds insurance money (the bot sends each coin's insurance share here, tagged per coin).
@@ -247,7 +247,7 @@ window.SITE = {
 <div class="wrap">
   <div class="tape" aria-hidden="true"></div>
   <header>
-    <div><h1 id="siteName"><span>insured</span></h1><span class="dept">Rug coverage desk · Solana</span></div>
+    <div><h1 id="siteName"><span>covered</span></h1><span class="dept">Rug coverage desk · Solana</span></div>
     <button id="connectBtn" class="ghost">Connect Phantom</button>
   </header>
 
@@ -265,7 +265,7 @@ window.SITE = {
     <div class="hero">
       <div class="hero-main">
         <div class="kicker">Warning: memecoins go to zero</div>
-        <h2 class="hero-h">Rugged?<br><span>Get insured.</span></h2>
+        <h2 class="hero-h">Rugged?<br><span>Get covered.</span></h2>
         <p>The launchpad where coins can carry 1–5% insurance. That cut of every trade pays holders who are down, up to break-even.</p>
         <div class="btns"><button id="heroFile">File a coin</button><button class="ghost" id="heroInsured">Browse insured coins</button></div>
       </div>
@@ -280,8 +280,8 @@ window.SITE = {
       <span id="burnBar" hidden><span id="burnNum">—</span> burned<span id="burnSub"></span></span>
       <span><b id="bnCoins">0</b> coins live</span>
       <span><b id="bnIns">0</b> insured</span>
-      <span id="caBox" hidden title="Click to copy the $INSURED contract address">CA <b id="caTxt"></b></span>
-      <a id="buyClaim" hidden target="_blank" rel="noopener">Buy $INSURED ↗</a>
+      <span id="caBox" hidden title="Click to copy the $COVERED contract address">CA <b id="caTxt"></b></span>
+      <a id="buyClaim" hidden target="_blank" rel="noopener">Buy $COVERED ↗</a>
     </div>
     <section class="soon" aria-label="Stock pairs, coming soon">
       <div class="soon-tag">Coming soon</div>
@@ -910,8 +910,8 @@ function wireTrade(){
 }
 
 // ---------- callouts (stored on-chain as signed memos) ----------
-const CALLOUT_PREFIX = 'insured:c:';
-const calloutAddr = mint => PublicKey.createWithSeed(new PublicKey(mint), 'insured-callouts', SystemProgram.programId);
+const CALLOUT_PREFIX = 'covered:c:';
+const calloutAddr = mint => PublicKey.createWithSeed(new PublicKey(mint), 'covered-callouts', SystemProgram.programId);
 async function postCallout(mint, text){
   text = text.replace(/\s+$/,'').slice(0, 280);
   if (!text) throw new Error('Write something first.');
@@ -1031,7 +1031,7 @@ $('launchBtn').onclick = async () => {
 const isAdmin = () => wallet && (!SITE.PLATFORM_WALLET || SITE.PLATFORM_WALLET === wallet.toBase58() || (SITE.INSURANCE_WALLET && SITE.INSURANCE_WALLET === wallet.toBase58()));
 const isInsuranceWallet = () => wallet && SITE.INSURANCE_WALLET && SITE.INSURANCE_WALLET === wallet.toBase58();
 const MEMO_PROGRAM = new PublicKey('MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr');
-const MEMO_IN = 'insured-ins:', MEMO_PAID = 'insured-paid:';
+const MEMO_IN = 'covered-ins:', MEMO_PAID = 'covered-paid:';
 const memoIx = text => new web3.TransactionInstruction({ programId: MEMO_PROGRAM, keys: [{ pubkey: wallet, isSigner: true, isWritable: false }], data: Buffer.from(text, 'utf8') });
 function buildConfigParams(ins, net, initMcap, gradMcap, createFeeSol, antiSnipe = false){
   const gross = (net + ins) / (1 - PROTOCOL_CUT);          // percent
@@ -1310,7 +1310,7 @@ async function distributeAll(){
   log('Finished distributing all insured coins.', 'ok');
 }
 
-// Insurance owed to one coin = deposits tagged insured-ins:<mint> minus payouts tagged insured-paid:<mint>
+// Insurance owed to one coin = deposits tagged covered-ins:<mint> minus payouts tagged covered-paid:<mint>
 async function insuranceOwed(mint){
   const vault = SITE.INSURANCE_WALLET, sigs = []; let before;
   while (sigs.length < 10000){
@@ -1382,7 +1382,7 @@ function allocate(losers, budget, coverPct, mode = 'hybrid', minPayout = 1_000_0
   }
   return list.filter(l => l.pay >= minPayout);
 }
-// What each wallet was already paid for this coin (payout txs are tagged insured-paid:<mint>)
+// What each wallet was already paid for this coin (payout txs are tagged covered-paid:<mint>)
 async function priorPayouts(mint){
   const payer = SITE.INSURANCE_WALLET || wallet.toBase58(), paid = new Map(); let before; const sigs = [];
   while (sigs.length < 10000){
