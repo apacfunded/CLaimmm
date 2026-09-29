@@ -26,6 +26,8 @@ window.SITE = {
   NET_PLATFORM_FEE_PCT: 1.25,   // 1% to you + 0.25% to $INSURED buyback & burn
   // Filled in by Admin → Setup. One fee config per insurance level (0 = no insurance).
   CONFIGS: { 0: '4w4TGnMdync9foqUeCuqgW4o5fst62SDDTMhRKiRXtVS', 1: 'F7mEVHMkU7GivdPemv2myuPyTsJ2NzxszCi8RKSP1zeA', 2: '2CSMfYoxS2HTNrtAAW9beCgZt98nWy8o4UjCS9YkCi95', 3: 'EsHiLiVoSGPzsfDRi9TeQrbCDAZQZUiheKwxJuft1LZb', 4: '4N91EcAxEaP2JRq2ULVUYwcNZgSbE5eAbtrW8nvppvRY', 5: 'Epq9KpGDgUqkJDd3CqkBu5uHVpEEsCH5Cyppw5sGuoPh' },
+  // Anti-snipe versions (Admin → Setup → Create anti-snipe configs): 50% fee at launch, falling to normal over 60 seconds.
+  CONFIGS_AS: { 0: '', 1: '', 2: '', 3: '', 4: '', 5: '' },
   // Buy back & burn: your main coin's mint address, and what share of YOUR platform fees goes to buybacks.
   CLAIM_MINT: '2TqQDESbLKFqkBkk9jkrZZ2ZErixthToitHPasxHpump',
   CLAIM_TICKER: 'INSURED',
@@ -176,6 +178,10 @@ window.SITE = {
   .banner #buyClaim{margin-left:auto;padding:12px 18px;white-space:nowrap;background:var(--bg);color:var(--accent);text-decoration:none;border:3px solid var(--accent)}
   .banner #buyClaim:hover{background:var(--accent-ink);color:var(--accent)}
   .banner [hidden]{display:none !important}
+  .asopt{display:flex;gap:10px;align-items:flex-start;margin:14px 0 4px;font-size:13px;line-height:1.45;cursor:pointer;text-transform:none;letter-spacing:0;color:var(--text)}
+  .asopt input{margin-top:3px;accent-color:var(--accent)}
+  .asopt[aria-disabled=true]{opacity:.45;cursor:not-allowed}
+  .badge.as{background:var(--text);color:var(--bg);border-color:var(--text)}
   .soon{display:flex;align-items:center;gap:22px;flex-wrap:wrap;border:2px dashed var(--line);padding:16px 20px;margin:0 0 22px}
   .soon-tag{font-size:12px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--accent-ink);background:var(--accent);padding:6px 10px}
   .soon-body{flex:1;min-width:240px}
@@ -324,6 +330,7 @@ window.SITE = {
       <h2>Section B · Coverage</h2>
       <p class="muted" style="margin-top:0;font-size:14px">Add an extra fee on every trade that goes into this coin's insurance pool. The pool is paid out to holders who are currently down on the coin. Can't be changed after launch.</p>
       <div class="ins" id="insPicker"></div>
+      <label class="asopt" id="asWrap"><input type="checkbox" id="antiSnipe"> <span><b>Anti-snipe launch</b> · 50% fee at launch, falling to the normal fee over 60 seconds. Snipers and bundle bots pay it; your dev buy doesn't.</span></label>
       <div class="feebox" id="feeBox"></div>
     </div>
 
@@ -356,7 +363,8 @@ window.SITE = {
         </div>
         <div class="hint">Defaults match pump.fun's curve: coins start around 23.5 SOL market cap and graduate to a Meteora pool at about 406 SOL. Creation fee: 0 = free like pump.fun (if set, it must be at least 0.001 SOL).</div>
         <div class="tablewrap" style="margin-top:14px"><table id="feeTable"></table></div>
-        <div class="btns"><button id="createConfigs">Create fee configs</button></div>
+        <div class="btns"><button id="createConfigs">Create fee configs</button><button class="ghost" id="createConfigsAS">Create anti-snipe configs</button></div>
+        <div class="hint">Anti-snipe configs let creators launch with a 50% trading fee that falls to the normal fee over the first 60 seconds. Snipers and bundle bots pay most of it; the creator's own dev buy at launch pays the normal fee. 6 more approvals, about 0.04 SOL.</div>
         <div id="snippetWrap" hidden>
           <label>Paste this over the <code>window.SITE</code> block at the top of the HTML file, then re-upload the file:</label>
           <pre class="snip" id="snippet"></pre>
@@ -463,6 +471,8 @@ window.SITE = {
     <label><input type="radio" name="ins" value="${l}" ${l === 0 ? 'checked' : ''}><span>${l ? '' + l + '%' : 'None'}<small>${l ? 'insurance' : 'no insurance'}</small></span></label>`).join('');
   window.renderLaunchBoxes = async () => {
     const lvl = window.insLevel;
+    const asOk = !!(SITE.CONFIGS_AS && SITE.CONFIGS_AS[lvl]), cb = $('antiSnipe');
+    if (cb){ cb.disabled = !asOk; if (!asOk) cb.checked = false; $('asWrap').setAttribute('aria-disabled', String(!asOk)); $('asWrap').title = asOk ? '' : 'Anti-snipe launches are not set up yet'; }
     $('feeBox').innerHTML = feeRows(lvl);
     const dev = parseFloat($('devBuy').value || '0') || 0;
     const createFee = window.getCreateFee ? await window.getCreateFee(lvl) : 0;
@@ -473,6 +483,7 @@ window.SITE = {
   };
   document.querySelectorAll('input[name=ins]').forEach(r => r.addEventListener('change', () => { window.insLevel = Number(r.value); renderLaunchBoxes(); }));
   $('devBuy').addEventListener('input', () => renderLaunchBoxes());
+  $('antiSnipe').addEventListener('change', () => renderLaunchBoxes());
   renderLaunchBoxes();
   $('aNet').value = SITE.NET_PLATFORM_FEE_PCT;
   const renderFeeTable = () => {
@@ -548,7 +559,14 @@ const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&l
 const sol = (lamports, d = 4) => (Number(lamports) / LAMPORTS_PER_SOL).toLocaleString(undefined, { maximumFractionDigits: d });
 const fmtNum = n => n >= 1e9 ? (n/1e9).toFixed(2)+'B' : n >= 1e6 ? (n/1e6).toFixed(2)+'M' : n >= 1e3 ? (n/1e3).toFixed(1)+'K' : n.toFixed(2);
 const grossPct = ins => (SITE.NET_PLATFORM_FEE_PCT + ins) / (1 - PROTOCOL_CUT);
-const levelOfConfig = addr => { for (const [k, v] of Object.entries(SITE.CONFIGS)) if (v && v === addr) return Number(k); return null; };
+const AS_START_BPS = 5000, AS_SECONDS = 60;   // anti-snipe: 50% → normal fee over 60 s
+const allConfigs = () => [
+  ...Object.entries(SITE.CONFIGS || {}).filter(([, v]) => v).map(([k, v]) => ({ addr: v, ins: Number(k), as: false })),
+  ...Object.entries(SITE.CONFIGS_AS || {}).filter(([, v]) => v).map(([k, v]) => ({ addr: v, ins: Number(k), as: true })),
+];
+const levelOfConfig = addr => { const c = allConfigs().find(x => x.addr === addr); return c ? c.ins : null; };
+const isAntiSnipe = addr => !!allConfigs().find(x => x.addr === addr && x.as);
+const configFor = (ins, as) => (as ? SITE.CONFIGS_AS?.[ins] : SITE.CONFIGS?.[ins]) || '';
 const lpMark = (ins = 0) => ins
   ? `<span class="lp-mark insured" title="${ins}% insurance: pays holders who are down">Insured</span>`
   : (safeUrl(SITE.LOGO_URL) ? `<img class="lp-mark" src="${esc(SITE.LOGO_URL)}" alt="${esc(SITE.NAME)}" title="Launched on ${esc(SITE.NAME)}">` : `<span class="lp-mark" title="Launched on ${esc(SITE.NAME)}">${esc(SITE.NAME)}</span>`);
@@ -675,14 +693,14 @@ function priceLamportsPerToken(pool){ // SOL per whole token as Decimal
 
 // ---------- coin list ----------
 async function loadCoins(){
-  const entries = Object.entries(SITE.CONFIGS).filter(([, v]) => v);
+  const entries = allConfigs();
   if (!entries.length){ $('coinGrid').innerHTML = '<div class="empty">No coins yet. The site owner needs to finish setup in Admin.</div>'; return; }
   $('coinGrid').innerHTML = '<div class="empty">Loading coins…</div>';
   try {
     const all = [];
-    for (const [lvl, cfg] of entries){
+    for (const { addr: cfg, ins, as } of entries){
       const [pools, config] = await Promise.all([client.state.getPoolsByConfig(cfg), getConfig(cfg)]);
-      for (const p of pools) all.push({ address: p.publicKey.toBase58(), pool: p.account, ins: Number(lvl), config, configAddr: cfg });
+      for (const p of pools) all.push({ address: p.publicKey.toBase58(), pool: p.account, ins, as, config, configAddr: cfg });
     }
     // metadata in batches of 100
     const pdas = all.map(c => metadataPda(new PublicKey(ps(c.pool).baseMint.toBase58())));
@@ -729,7 +747,7 @@ function renderGrid(){
       <div class="meta">
         <div class="nm">${esc(c.meta.name)}</div>
         <div class="tk">$${esc(c.meta.symbol)} · mcap ${fmtNum(c.mcap)} SOL</div>
-        ${c.ins ? `<span class="badge">${c.ins}% insured</span>` : ''} ${c.migrated ? '<span class="badge grad">graduated</span>' : ''}
+        ${c.ins ? `<span class="badge">${c.ins}% insured</span>` : ''} ${c.as ? '<span class="badge as">anti-snipe</span>' : ''} ${c.migrated ? '<span class="badge grad">graduated</span>' : ''}
         <div class="bar"><i style="width:${(c.progress * 100).toFixed(1)}%"></i></div>
         <div class="small-stat">${(c.progress * 100).toFixed(1)}% to graduation</div>
       </div>
@@ -774,7 +792,7 @@ async function openCoin(address){
       <div class="coinhead">
         <div class="thumb">${safeUrl(json.image) ? `<img src="${esc(json.image)}" alt="">` : '<div class="preview" style="width:88px;height:88px">no image</div>'}${lpMark(ins)}</div>
         <div><h3>${esc(meta.name)} <span class="muted">$${esc(meta.symbol)}</span></h3>
-          ${ins ? `<span class="badge">${ins}% insurance</span>` : '<span class="muted" style="font-size:13px">No insurance</span>'} ${migrated ? '<span class="badge grad">graduated</span>' : ''}
+          ${ins ? `<span class="badge">${ins}% insurance</span>` : '<span class="muted" style="font-size:13px">No insurance</span>'} ${isAntiSnipe(configAddr) ? '<span class="badge as">anti-snipe</span>' : ''} ${migrated ? '<span class="badge grad">graduated</span>' : ''}
           <div class="muted" style="font-size:13px;margin-top:6px">${esc(json.description || '')}</div>
           <div style="font-size:13px;margin-top:4px">${links}</div>
         </div>
@@ -789,6 +807,7 @@ async function openCoin(address){
           <div class="stat"><span>Graduation</span><b>${(progress * 100).toFixed(1)}%</b></div>
           <div class="bar"><i style="width:${(progress * 100).toFixed(1)}%"></i></div>
           <div class="stat" style="margin-top:8px"><span>Trading fee</span><b>${grossPct(ins).toFixed(3)}%</b></div>
+          ${isAntiSnipe(configAddr) ? `<div class="stat"><span>Anti-snipe</span><b>50% fee at launch, down to ${grossPct(ins).toFixed(3)}% after 60 seconds</b></div>` : ''}
           ${ins ? `<div class="stat"><span>Insurance</span><b>${ins}% of every trade goes to holders who are down</b></div>` : ''}
           <div class="stat"><span>Token</span><b><a href="https://solscan.io/token/${mint}${cl}" target="_blank" rel="noopener">${short(mint)}</a></b></div>
         </div>
@@ -958,7 +977,7 @@ function wireCallouts(mint, creator){
 
 // ---------- launch ----------
 window.getCreateFee = async lvl => {
-  const cfgAddr = SITE.CONFIGS[lvl]; if (!cfgAddr) return 0;
+  const cfgAddr = configFor(lvl, !!($('antiSnipe') && $('antiSnipe').checked)) || SITE.CONFIGS[lvl]; if (!cfgAddr) return 0;
   try { const c = await getConfig(cfgAddr); return Number((c.poolCreationFee ?? new BN(0)).toString()) / LAMPORTS_PER_SOL; } catch { return 0; }
 };
 const renderLaunchBoxes = () => window.renderLaunchBoxes();
@@ -974,11 +993,11 @@ $('launchBtn').onclick = async () => {
   const name = $('name').value.trim(), symbol = $('symbol').value.trim().toUpperCase();
   const description = $('description').value.trim(), file = $('image').files[0];
   const dev = parseFloat($('devBuy').value || '0') || 0;
-  const insLevel = window.insLevel; const config = SITE.CONFIGS[insLevel];
-  if (!config) return log('This insurance level is not set up on the site yet.', 'err');
+  const insLevel = window.insLevel; const as = !!($('antiSnipe') && $('antiSnipe').checked); const config = configFor(insLevel, as);
+  if (!config) return log(as ? 'Anti-snipe launches are not set up on the site yet.' : 'This insurance level is not set up on the site yet.', 'err');
   if (!name || !symbol) return log('Name and ticker are required.', 'err');
   if (!file) return log('Pick an image.', 'err');
-  if (!confirm(`Launch ${name} ($${symbol})\nInsurance: ${insLevel ? insLevel + '%' : 'none'}\nTrading fee: ${grossPct(insLevel).toFixed(3)}%\nDev buy: ${dev} SOL`)) return;
+  if (!confirm(`Launch ${name} ($${symbol})\nInsurance: ${insLevel ? insLevel + '%' : 'none'}\nTrading fee: ${grossPct(insLevel).toFixed(3)}%${as ? ' (50% for the first 60 seconds: anti-snipe)' : ''}\nDev buy: ${dev} SOL`)) return;
 
   const btn = $('launchBtn'); btn.disabled = true; btn.textContent = 'Filing…';
   try {
@@ -1014,16 +1033,18 @@ const isInsuranceWallet = () => wallet && SITE.INSURANCE_WALLET && SITE.INSURANC
 const MEMO_PROGRAM = new PublicKey('MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr');
 const MEMO_IN = 'insured-ins:', MEMO_PAID = 'insured-paid:';
 const memoIx = text => new web3.TransactionInstruction({ programId: MEMO_PROGRAM, keys: [{ pubkey: wallet, isSigner: true, isWritable: false }], data: Buffer.from(text, 'utf8') });
-function buildConfigParams(ins, net, initMcap, gradMcap, createFeeSol){
+function buildConfigParams(ins, net, initMcap, gradMcap, createFeeSol, antiSnipe = false){
   const gross = (net + ins) / (1 - PROTOCOL_CUT);          // percent
   const grossBps = Math.round(gross * 100);
   const params = buildCurveWithMarketCap({
     token: { tokenType: TokenType.SPLToken, tokenBaseDecimal: TokenDecimal.SIX, tokenQuoteDecimal: TokenDecimal.NINE,
              tokenAuthorityOption: TokenAuthorityOption.Immutable, totalTokenSupply: SUPPLY, leftover: 10000 },
     fee: { baseFeeParams: { baseFeeMode: BaseFeeMode.FeeSchedulerLinear,
-             feeSchedulerParam: { startingFeeBps: grossBps, endingFeeBps: grossBps, numberOfPeriod: 0, totalDuration: 0 } },
+             feeSchedulerParam: antiSnipe
+               ? { startingFeeBps: AS_START_BPS, endingFeeBps: grossBps, numberOfPeriod: AS_SECONDS, totalDuration: AS_SECONDS }
+               : { startingFeeBps: grossBps, endingFeeBps: grossBps, numberOfPeriod: 0, totalDuration: 0 } },
            dynamicFeeEnabled: false, collectFeeMode: CollectFeeMode.QuoteToken, creatorTradingFeePercentage: 0,
-           poolCreationFee: createFeeSol, enableFirstSwapWithMinFee: false },
+           poolCreationFee: createFeeSol, enableFirstSwapWithMinFee: antiSnipe },
     migration: { migrationOption: MigrationOption.MET_DAMM_V2, migrationFeeOption: MigrationFeeOption.Customizable,
                  migrationFee: { feePercentage: 0, creatorFeePercentage: 0 },
                  migratedPoolFee: { collectFeeMode: MigratedCollectFeeMode.QuoteToken, dynamicFee: DammV2DynamicFeeMode.Disabled,
@@ -1035,35 +1056,46 @@ function buildConfigParams(ins, net, initMcap, gradMcap, createFeeSol){
     initialMarketCap: initMcap, migrationMarketCap: gradMcap,
   });
   // exact fee (bps can't express e.g. 1.875%)
-  params.poolFees.baseFee.cliffFeeNumerator = new BN(Math.round(gross / 100 * 1e9));
+  const endNum = Math.round(gross / 100 * 1e9);
+  if (antiSnipe){
+    // linear decay: fee = cliff − reduction × period; pick an integer reduction so it lands exactly on the normal fee
+    const reduction = Math.floor((AS_START_BPS * 1e5 - endNum) / AS_SECONDS);
+    params.poolFees.baseFee.cliffFeeNumerator = new BN(endNum + reduction * AS_SECONDS);
+    params.poolFees.baseFee.thirdFactor = new BN(reduction);
+  } else params.poolFees.baseFee.cliffFeeNumerator = new BN(endNum);
   return params;
 }
 
-$('createConfigs').onclick = async () => {
+$('createConfigs').onclick = () => createConfigSet(false);
+$('createConfigsAS').onclick = () => createConfigSet(true);
+async function createConfigSet(antiSnipe){
   if (!isAdmin()) return log('Connect the platform wallet first.', 'err');
   const net = parseFloat($('aNet').value), init = parseFloat($('aInit').value), grad = parseFloat($('aGrad').value), cfee = parseFloat($('aCreate').value) || 0;
   if (!(net > 0) || !(init > 0) || !(grad > init)) return log('Check the fee and market cap numbers.', 'err');
   if (cfee && (cfee < 0.001 || cfee > 100)) return log('Creation fee must be 0, or between 0.001 and 100 SOL.', 'err');
-  if (!confirm(`Create 6 fee configs?\nYour fee: ${net}% per trade\nCurve: ${init} → ${grad} SOL market cap\nCreation fee: ${cfee} SOL\n\nYou'll approve 6 transactions.`)) return;
-  $('createConfigs').disabled = true;
-  const made = { ...SITE.CONFIGS };
+  const kind = antiSnipe ? 'anti-snipe ' : '';
+  if (!confirm(`Create 6 ${kind}fee configs?\nYour fee: ${net}% per trade${antiSnipe ? ' (50% at launch, falling to normal over 60 s)' : ''}\nCurve: ${init} → ${grad} SOL market cap\nCreation fee: ${cfee} SOL\n\nYou'll approve 6 transactions.`)) return;
+  $('createConfigs').disabled = true; $('createConfigsAS').disabled = true;
+  const made = { ...(antiSnipe ? (SITE.CONFIGS_AS || {}) : SITE.CONFIGS) };
   try {
     for (const ins of [0,1,2,3,4,5]){
       const kp = Keypair.generate();
-      const params = buildConfigParams(ins, net, init, grad, cfee);
+      if (made[ins]) continue;   // already created
+      const params = buildConfigParams(ins, net, init, grad, cfee, antiSnipe);
       const tx = await client.partner.createConfig({ config: kp.publicKey, feeClaimer: wallet, leftoverReceiver: wallet, payer: wallet, quoteMint: new PublicKey(WSOL), ...params });
-      log(`Config ${ins}% insurance: approve in Phantom (${ins + 1}/6)…`);
+      log(`${antiSnipe ? 'Anti-snipe config' : 'Config'} ${ins}% insurance: approve in Phantom (${ins + 1}/6)…`);
       await sendTx(tx, [kp]);
       made[ins] = kp.publicKey.toBase58();
-      log(`Created config for ${ins}% insurance: ${made[ins]}`, 'ok');
-      showSnippet(made, net);
+      log(`Created ${kind}config for ${ins}% insurance: ${made[ins]}`, 'ok');
+      showSnippet(made, net, antiSnipe);
     }
-    log('All configs created. Paste the snippet into your HTML file and re-upload it.', 'ok');
-  } catch(e){ log(e.message || String(e), 'err'); showSnippet(made, net); }
-  finally { $('createConfigs').disabled = false; }
-};
-function showSnippet(configs, net){
-  const s = { ...SITE, PLATFORM_WALLET: wallet.toBase58(), NET_PLATFORM_FEE_PCT: net, CONFIGS: configs };
+    log(`All ${kind}configs created. Copy the settings box and send it to whoever maintains the site.`, 'ok');
+  } catch(e){ log(e.message || String(e), 'err'); showSnippet(made, net, antiSnipe); }
+  finally { $('createConfigs').disabled = false; $('createConfigsAS').disabled = false; }
+}
+function showSnippet(configs, net, antiSnipe = false){
+  const s = { ...SITE, PLATFORM_WALLET: wallet.toBase58(), NET_PLATFORM_FEE_PCT: net };
+  if (antiSnipe) s.CONFIGS_AS = configs; else s.CONFIGS = configs;
   $('snippet').textContent = 'window.SITE = ' + JSON.stringify(s, null, 2) + ';';
   $('snippetWrap').hidden = false;
 }
