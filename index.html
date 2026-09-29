@@ -549,20 +549,61 @@ async function connect(silent){
 }
 $('connectBtn').onclick = () => connect(false);
 
-async function sendTx(sdkTx, signers = [], cuPrice = 100_000){
-  const tx = new Transaction();
-  tx.add(ComputeBudgetProgram.setComputeUnitPrice({ microLamports: cuPrice }));
-  tx.add(...sdkTx.instructions);
-  tx.feePayer = wallet;
+// Priority fee from Helius (what it currently takes to land quickly), with a safe fallback and a cap.
+async function priorityFee(ixs){
+  try {
+    const keys = [...new Set(ixs.flatMap(ix => [ix.programId.toBase58(), ...ix.keys.filter(k => k.isWritable).map(k => k.pubkey.toBase58())]))];
+    const r = await fetch(SITE.RPC_URL, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'getPriorityFeeEstimate', params: [{ accountKeys: keys, options: { priorityLevel: 'High' } }] }) });
+    const est = (await r.json())?.result?.priorityFeeEstimate;
+    if (est > 0) return Math.min(Math.max(Math.ceil(est), 50_000), 3_000_000);
+  } catch(e){}
+  return 300_000;
+}
+async function sendTx(sdkTx, signers = [], cuPrice){
+  const ixs = sdkTx.instructions.filter(ix => !ix.programId.equals(ComputeBudgetProgram.programId));
+  const build = (limit, price, blockhash) => {
+    const t = new Transaction();
+    if (limit) t.add(ComputeBudgetProgram.setComputeUnitLimit({ units: limit }));
+    t.add(ComputeBudgetProgram.setComputeUnitPrice({ microLamports: price }));
+    t.add(...ixs); t.feePayer = wallet; t.recentBlockhash = blockhash;
+    return t;
+  };
+  // 1) Simulate to size the compute limit (a tight limit + a priority fee lands much faster when Solana is busy).
+  let limit = 0;
+  try {
+    const bh0 = await connection.getLatestBlockhash('confirmed');
+    const simTx = build(1_400_000, 1, bh0.blockhash);
+    const r = await connection.simulateTransaction(simTx);
+    if (r?.value?.err){
+      const why = (r.value.logs || []).filter(l => /error|failed|insufficient/i.test(l)).slice(-2).join(' | ');
+      throw Object.assign(new Error('This transaction would fail: ' + (why || JSON.stringify(r.value.err))), { simFail: true });
+    }
+    if (r?.value?.unitsConsumed) limit = Math.min(1_400_000, Math.ceil(r.value.unitsConsumed * 1.2) + 20_000);
+  } catch(e){ if (e.simFail) throw e; }
+  const price = cuPrice ?? await priorityFee(ixs);
+  // 2) Fresh blockhash right before Phantom opens, so the approval window is as long as possible.
   const bh = await connection.getLatestBlockhash('confirmed');
-  tx.recentBlockhash = bh.blockhash;
+  const tx = build(limit, price, bh.blockhash);
   if (signers.length) tx.partialSign(...signers);
   const signed = await provider.signTransaction(tx);
-  const sig = await connection.sendRawTransaction(signed.serialize(), { maxRetries: 3 });
+  const raw = signed.serialize();
+  const sig = await connection.sendRawTransaction(raw, { skipPreflight: true, maxRetries: 0 });
   log('Sent: ' + sig);
-  const conf = await connection.confirmTransaction({ signature: sig, ...bh }, 'confirmed');
-  if (conf.value.err) throw new Error('Transaction failed on-chain: ' + JSON.stringify(conf.value.err));
-  return sig;
+  // 3) Keep re-sending until it confirms or the blockhash expires (Solana drops transactions when busy).
+  const resend = setInterval(() => connection.sendRawTransaction(raw, { skipPreflight: true, maxRetries: 0 }).catch(() => {}), 2000);
+  try {
+    const conf = await connection.confirmTransaction({ signature: sig, ...bh }, 'confirmed');
+    if (conf.value.err) throw new Error('Transaction failed on-chain: ' + JSON.stringify(conf.value.err));
+    return sig;
+  } catch(e){
+    if (/expired|block height exceeded/i.test(e.message || '')){
+      try { const st = await connection.getSignatureStatus(sig, { searchTransactionHistory: true });
+        if (st?.value && !st.value.err) return sig; } catch(_){}
+      throw new Error("Solana was busy and this transaction didn't go through. Nothing was charged. Please try again, and approve in Phantom right away.");
+    }
+    throw e;
+  } finally { clearInterval(resend); }
 }
 
 // ---------- metadata (Metaplex) ----------
@@ -815,7 +856,7 @@ async function postCallout(mint, text){
   const tx = new Transaction().add(
     SystemProgram.transfer({ fromPubkey: wallet, toPubkey: tag, lamports: 0 }),   // tags the tx so it can be found per coin
     memoIx(CALLOUT_PREFIX + text));
-  return sendTx(tx, [], 0);
+  return sendTx(tx);
 }
 async function loadCallouts(mint, creator){
   const tag = await calloutAddr(mint);
