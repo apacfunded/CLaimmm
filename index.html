@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>claim</title>
+<title>insured</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 <script>
@@ -12,7 +12,7 @@
    The Admin tab fills most of this in for you after setup.
    ============================================================ */
 window.SITE = {
-  NAME: 'claim',
+  NAME: 'insured',
   // Your site's address and logo (square PNG/JPG URL). Shown on every coin and registered on-chain from Admin.
   WEBSITE: 'https://claimpad.lol',
   LOGO_URL: 'https://gateway.pinata.cloud/ipfs/bafkreia7mlsaq3c5wjknxlwykqknihpwbdtq67fhhbi5qntdsl33kymrem',
@@ -23,12 +23,12 @@ window.SITE = {
   // Pinata JWT used for coin images. Use a key limited to file uploads only — it is visible to visitors.
   PINATA_JWT: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiIyNTA0ZDI1Ni1hYmRmLTRmMDAtYTdhMS1kMTZiMTdmYWFmOTgiLCJlbWFpbCI6ImFwYWNmdW5kZWRAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsInBpbl9wb2xpY3kiOnsicmVnaW9ucyI6W3siZGVzaXJlZFJlcGxpY2F0aW9uQ291bnQiOjEsImlkIjoiRlJBMSJ9LHsiZGVzaXJlZFJlcGxpY2F0aW9uQ291bnQiOjEsImlkIjoiTllDMSJ9XSwidmVyc2lvbiI6MX0sIm1mYV9lbmFibGVkIjpmYWxzZSwic3RhdHVzIjoiQUNUSVZFIn0sImF1dGhlbnRpY2F0aW9uVHlwZSI6InNjb3BlZEtleSIsInNjb3BlZEtleUtleSI6IjU2YTczMzg0MWYxMWM4NjdmNDkzIiwic2NvcGVkS2V5U2VjcmV0IjoiMTI1YTgyMzBlZWYwMzNjNmYzMzcwOTNiZmViNzIzM2IxYzM3MzhjMDA5ZmRiOTFlNDA2MTRhMDRkNDNiMDkyNCIsImV4cCI6MTgyMjEwNDk0Mn0.a8DmB5JsYHLDaj7Oj3xh6utyvCwSNFVo3eD01xeJaLw',
   // What you keep from every trade, after Meteora's cut.
-  NET_PLATFORM_FEE_PCT: 1.25,   // 1% to you + 0.25% to $CLAIM buyback & burn
+  NET_PLATFORM_FEE_PCT: 1.25,   // 1% to you + 0.25% to $INSURED buyback & burn
   // Filled in by Admin → Setup. One fee config per insurance level (0 = no insurance).
   CONFIGS: { 0: '4w4TGnMdync9foqUeCuqgW4o5fst62SDDTMhRKiRXtVS', 1: 'F7mEVHMkU7GivdPemv2myuPyTsJ2NzxszCi8RKSP1zeA', 2: '2CSMfYoxS2HTNrtAAW9beCgZt98nWy8o4UjCS9YkCi95', 3: 'EsHiLiVoSGPzsfDRi9TeQrbCDAZQZUiheKwxJuft1LZb', 4: '4N91EcAxEaP2JRq2ULVUYwcNZgSbE5eAbtrW8nvppvRY', 5: 'Epq9KpGDgUqkJDd3CqkBu5uHVpEEsCH5Cyppw5sGuoPh' },
   // Buy back & burn: your main coin's mint address, and what share of YOUR platform fees goes to buybacks.
-  CLAIM_MINT: 'C8g9TLh8QNncMq1JQtCFcEENGjrSVP2LvUbmkDPLpump',
-  CLAIM_TICKER: 'CLAIM',
+  CLAIM_MINT: '',
+  CLAIM_TICKER: 'INSURED',
   CLAIM_START_SUPPLY: 1000000000,
   BUYBACK_PCT: 20,              // share of the platform fee used for buyback & burn (20% of 1.25% = 0.25% of every trade)
   // Wallet that holds insurance money (the bot sends each coin's insurance share here, tagged per coin).
@@ -227,7 +227,7 @@ window.SITE = {
   .coinhead{gap:30px}
   .thesis .st{position:absolute;top:-13px;right:12px;font:400 15px/1 var(--display);color:var(--accent-ink);background:var(--accent);padding:5px 12px;transform:rotate(3deg);text-transform:uppercase;letter-spacing:.1em}
   .empty{font-family:var(--display);font-size:24px;letter-spacing:.04em;text-transform:uppercase;grid-column:1/-1}
-  /* big stamp (FILED / CLAIM APPROVED / BURNED) */
+  /* big stamp (FILED / PAYOUT SENT / BURNED) */
   #stamp{position:fixed;inset:0;display:grid;place-items:center;pointer-events:none;z-index:50}
   #stamp div{font:400 clamp(48px,10vw,120px)/1 var(--display);color:var(--accent-ink);background:var(--accent);border:10px solid var(--bg);outline:6px solid var(--accent);padding:14px 40px;text-transform:uppercase;letter-spacing:.06em;opacity:0;transform:rotate(-8deg) scale(2.2)}
   #stamp div.go{animation:stampIn 1.8s cubic-bezier(.2,.9,.3,1.2) forwards}
@@ -241,7 +241,7 @@ window.SITE = {
 <div class="wrap">
   <div class="tape" aria-hidden="true"></div>
   <header>
-    <div><h1 id="siteName"><span>claim</span></h1><span class="dept">Rug coverage desk · Solana</span></div>
+    <div><h1 id="siteName"><span>insured</span></h1><span class="dept">Rug coverage desk · Solana</span></div>
     <button id="connectBtn" class="ghost">Connect Phantom</button>
   </header>
 
@@ -259,12 +259,12 @@ window.SITE = {
     <div class="hero">
       <div class="hero-main">
         <div class="kicker">Warning: memecoins go to zero</div>
-        <h2 class="hero-h">Rugged?<br><span>File a claim.</span></h2>
+        <h2 class="hero-h">Rugged?<br><span>Get insured.</span></h2>
         <p>The launchpad where coins can carry 1–5% insurance. That cut of every trade pays holders who are down, up to break-even.</p>
         <div class="btns"><button id="heroFile">File a coin</button><button class="ghost" id="heroInsured">Browse insured coins</button></div>
       </div>
       <aside class="how">
-        <h4>How a claim works</h4>
+        <h4>How insurance works</h4>
         <div><b>1</b><span>Creator files a coin and picks 1–5% coverage.</span></div>
         <div><b>2</b><span>Every trade adds that % to the coin’s insurance pool.</span></div>
         <div><b>3</b><span>Holders who are down get paid, bigger losses first, never past break-even.</span></div>
@@ -274,14 +274,14 @@ window.SITE = {
       <span id="burnBar" hidden><span id="burnNum">—</span> burned<span id="burnSub"></span></span>
       <span><b id="bnCoins">0</b> coins live</span>
       <span><b id="bnIns">0</b> insured</span>
-      <span id="caBox" hidden title="Click to copy the $CLAIM contract address">CA <b id="caTxt"></b></span>
-      <a id="buyClaim" hidden target="_blank" rel="noopener">Buy $CLAIM ↗</a>
+      <span id="caBox" hidden title="Click to copy the $INSURED contract address">CA <b id="caTxt"></b></span>
+      <a id="buyClaim" hidden target="_blank" rel="noopener">Buy $INSURED ↗</a>
     </div>
     <section class="soon" aria-label="Stock pairs, coming soon">
       <div class="soon-tag">Coming soon</div>
       <div class="soon-body">
         <h3>Stock pairs</h3>
-        <p>Coins priced in tokenized stocks instead of SOL. Not live yet: every coin on claim trades against SOL today.</p>
+        <p>Coins priced in tokenized stocks instead of SOL. Not live yet: every coin here trades against SOL today.</p>
       </div>
       <div class="soon-chips" aria-hidden="true"><span>TSLAx</span><span>NVDAx</span><span>AAPLx</span><span>SPYx</span></div>
     </section>
@@ -381,14 +381,14 @@ window.SITE = {
         <div class="btns" style="margin-top:0"><button class="ghost small" id="loadFees">Load coins</button><button class="small" id="distAll">Distribute all insurance now</button><span class="muted" id="feeTotals"></span></div>
         <p class="hint" style="margin-top:6px"><b>Distribute now</b> pays every holder who is down right now in one click, with no 24-hour wait. Nobody is paid past break-even, and earlier payouts are always subtracted.</p>
         <div class="tablewrap" style="margin-top:10px"><table id="adminCoins"></table></div>
-        <p class="hint">Fees are collected while a coin is on the bonding curve. After graduation, your locked LP position in the Meteora pool keeps earning fees; claim those from your Meteora portfolio (app.meteora.ag) and pay the insurance share out here with a manual budget.</p>
+        <p class="hint">Fees are collected while a coin is on the bonding curve. After graduation, your locked LP position in the Meteora pool keeps earning fees; collect those from your Meteora portfolio (app.meteora.ag) and pay the insurance share out here with a manual budget.</p>
       </div>
 
       <div class="card" id="bbCard">
         <h2>Buy back & burn</h2>
-        <p class="muted" style="margin-top:0;font-size:14px">Spends SOL from your wallet to buy your main coin on Jupiter, then burns exactly what was bought. Burned tokens are gone forever, which shrinks supply. Each claim adds the buyback share (0.25% of every trade, set by SITE.BUYBACK_PCT) to the amount below. The bot does this automatically every hour.</p>
+        <p class="muted" style="margin-top:0;font-size:14px">Spends SOL from your wallet to buy your main coin on Jupiter, then burns exactly what was bought. Burned tokens are gone forever, which shrinks supply. Each fee collection adds the buyback share (0.25% of every trade, set by SITE.BUYBACK_PCT) to the amount below. The bot does this automatically every hour.</p>
         <div class="row">
-          <div><label>Coin to buy back (mint)</label><input id="bbMint" placeholder="Set SITE.CLAIM_MINT"></div>
+          <div><label>Coin to buy back (mint)</label><input id="bbMint" placeholder="Your main coin's mint address"></div>
           <div><label>Jupiter API key</label><input id="bbKey" type="password" placeholder="free at portal.jup.ag"></div>
         </div>
         <div class="row">
@@ -891,8 +891,8 @@ function wireTrade(){
 }
 
 // ---------- callouts (stored on-chain as signed memos) ----------
-const CALLOUT_PREFIX = 'claim:c:';
-const calloutAddr = mint => PublicKey.createWithSeed(new PublicKey(mint), 'claim-callouts', SystemProgram.programId);
+const CALLOUT_PREFIX = 'insured:c:';
+const calloutAddr = mint => PublicKey.createWithSeed(new PublicKey(mint), 'insured-callouts', SystemProgram.programId);
 async function postCallout(mint, text){
   text = text.replace(/\s+$/,'').slice(0, 280);
   if (!text) throw new Error('Write something first.');
@@ -1012,7 +1012,7 @@ $('launchBtn').onclick = async () => {
 const isAdmin = () => wallet && (!SITE.PLATFORM_WALLET || SITE.PLATFORM_WALLET === wallet.toBase58() || (SITE.INSURANCE_WALLET && SITE.INSURANCE_WALLET === wallet.toBase58()));
 const isInsuranceWallet = () => wallet && SITE.INSURANCE_WALLET && SITE.INSURANCE_WALLET === wallet.toBase58();
 const MEMO_PROGRAM = new PublicKey('MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr');
-const MEMO_IN = 'claim-ins:', MEMO_PAID = 'claim-paid:';
+const MEMO_IN = 'insured-ins:', MEMO_PAID = 'insured-paid:';
 const memoIx = text => new web3.TransactionInstruction({ programId: MEMO_PROGRAM, keys: [{ pubkey: wallet, isSigner: true, isWritable: false }], data: Buffer.from(text, 'utf8') });
 function buildConfigParams(ins, net, initMcap, gradMcap, createFeeSol){
   const gross = (net + ins) / (1 - PROTOCOL_CUT);          // percent
@@ -1102,7 +1102,7 @@ $('pmBtn').onclick = async () => {
 $('bbMint').value = SITE.CLAIM_MINT || '';
 function updateBuybackUI(){
   $('bbAmt').value = (Number(pendingBuyback) / LAMPORTS_PER_SOL).toFixed(6);
-  $('bbPending').textContent = pendingBuyback > 0n ? `Set aside from claims this session: ${sol(pendingBuyback)} SOL` : '';
+  $('bbPending').textContent = pendingBuyback > 0n ? `Set aside from fee collections this session: ${sol(pendingBuyback)} SOL` : '';
 }
 function showClaimLinks(){
   const mint = SITE.CLAIM_MINT; if (!mint) return;
@@ -1207,11 +1207,11 @@ async function loadAdminCoins(){
     const insShare = c.ins ? fee * BigInt(Math.round(c.ins * 1000)) / BigInt(Math.round((SITE.NET_PLATFORM_FEE_PCT + c.ins) * 1000)) : 0n;
     return `<tr><td>${esc(c.meta.name)} <span class="muted">$${esc(c.meta.symbol)}</span></td><td>${c.ins ? c.ins + '%' : '—'}</td>
       <td class="num">${sol(fee)}</td><td class="num">${sol(fee - insShare)}</td><td class="num">${sol(insShare)}</td>
-      <td><button class="small" data-claim="${i}" ${fee === 0n ? 'disabled' : ''}>Claim</button>
+      <td><button class="small" data-claim="${i}" ${fee === 0n ? 'disabled' : ''}>Collect</button>
       ${c.ins ? `<button class="small" data-dist="${i}">Distribute now</button> <button class="small ghost" data-pay="${i}">Payout</button>` : ''}</td></tr>`;
   }).join('');
-  $('adminCoins').innerHTML = `<tr><th>Coin</th><th>Insurance</th><th class="num">Unclaimed SOL</th><th class="num">Yours</th><th class="num">Insurance</th><th></th></tr>` + (rows || '<tr><td colspan="6" class="muted">No coins yet.</td></tr>');
-  $('feeTotals').textContent = `Unclaimed across all coins: ${sol(totalFees)} SOL`;
+  $('adminCoins').innerHTML = `<tr><th>Coin</th><th>Insurance</th><th class="num">Uncollected SOL</th><th class="num">Yours</th><th class="num">Insurance</th><th></th></tr>` + (rows || '<tr><td colspan="6" class="muted">No coins yet.</td></tr>');
+  $('feeTotals').textContent = `Uncollected across all coins: ${sol(totalFees)} SOL`;
   document.querySelectorAll('[data-claim]').forEach(b => b.onclick = () => claim(coins[b.dataset.claim]));
   document.querySelectorAll('[data-pay]').forEach(b => b.onclick = () => openPayout(coins[b.dataset.pay]));
   document.querySelectorAll('[data-dist]').forEach(b => b.onclick = async () => { b.disabled = true; try { await distributeNow(coins[b.dataset.dist]); } finally { b.disabled = false; } });
@@ -1222,9 +1222,9 @@ async function claim(c){
   try {
     const pool = await client.state.getPool(c.address);
     const amt = ps(pool).partnerQuoteFee;
-    if (amt.isZero()) return log('Nothing to claim.');
+    if (amt.isZero()) return log('Nothing to collect.');
     const tx = await client.partner.claimPartnerTradingFee({ pool: new PublicKey(c.address), feeClaimer: wallet, payer: wallet, maxBaseAmount: new BN(0), maxQuoteAmount: amt });
-    log(`Claiming ${sol(amt.toString())} SOL from ${c.meta.symbol}… approve in Phantom`);
+    log(`Collecting ${sol(amt.toString())} SOL from ${c.meta.symbol}… approve in Phantom`);
     await sendTx(tx);
     const claimed = BigInt(amt.toString());
     const insShare = c.ins ? claimed * BigInt(c.ins * 1000) / BigInt(Math.round((SITE.NET_PLATFORM_FEE_PCT + c.ins) * 1000)) : 0n;
@@ -1235,7 +1235,7 @@ async function claim(c){
     } else lastClaim[c.address] = (lastClaim[c.address] || 0n) + insShare;
     const bb = (claimed - insShare) * BigInt(Math.round((SITE.BUYBACK_PCT || 0) * 100)) / 10000n;
     if (bb > 0n){ pendingBuyback += bb; updateBuybackUI(); log(`${sol(bb)} SOL set aside for $${SITE.CLAIM_TICKER} buyback (${(SITE.NET_PLATFORM_FEE_PCT * SITE.BUYBACK_PCT / 100).toFixed(2)}% of trades).`); }
-    log(`Claimed ${sol(claimed)} SOL. Yours: ${sol(claimed - insShare)} · Insurance to pay out: ${sol(insShare)}`, 'ok');
+    log(`Collected ${sol(claimed)} SOL. Yours: ${sol(claimed - insShare)} · Insurance to pay out: ${sol(insShare)}`, 'ok');
     await loadCoins(); loadAdminCoins();
     if (c.ins) openPayout(coins.find(x => x.address === c.address) || c);
   } catch(e){ log(e.message || String(e), 'err'); }
@@ -1278,7 +1278,7 @@ async function distributeAll(){
   log('Finished distributing all insured coins.', 'ok');
 }
 
-// Insurance owed to one coin = deposits tagged claim-ins:<mint> minus payouts tagged claim-paid:<mint>
+// Insurance owed to one coin = deposits tagged insured-ins:<mint> minus payouts tagged insured-paid:<mint>
 async function insuranceOwed(mint){
   const vault = SITE.INSURANCE_WALLET, sigs = []; let before;
   while (sigs.length < 10000){
@@ -1350,7 +1350,7 @@ function allocate(losers, budget, coverPct, mode = 'hybrid', minPayout = 1_000_0
   }
   return list.filter(l => l.pay >= minPayout);
 }
-// What each wallet was already paid for this coin (payout txs are tagged claim-paid:<mint>)
+// What each wallet was already paid for this coin (payout txs are tagged insured-paid:<mint>)
 async function priorPayouts(mint){
   const payer = SITE.INSURANCE_WALLET || wallet.toBase58(), paid = new Map(); let before; const sigs = [];
   while (sigs.length < 10000){
@@ -1453,7 +1453,7 @@ async function sendPayouts(){
     }
     lastClaim[payCoin.address] = 0n; $('payBudget').value = '0';
     log(`Insurance paid: ${sol(total)} SOL to ${payList.length} holders.`, 'ok');
-    window.stamp('Claim approved', true);
+    window.stamp('Payout sent', true);
   } catch(e){ log(e.message || String(e), 'err'); $('sendPayouts').disabled = false; }
 }
 
