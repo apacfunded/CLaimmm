@@ -27,7 +27,7 @@ window.SITE = {
   // Filled in by Admin → Setup. One fee config per insurance level (0 = no insurance).
   CONFIGS: { 0: '4w4TGnMdync9foqUeCuqgW4o5fst62SDDTMhRKiRXtVS', 1: 'F7mEVHMkU7GivdPemv2myuPyTsJ2NzxszCi8RKSP1zeA', 2: '2CSMfYoxS2HTNrtAAW9beCgZt98nWy8o4UjCS9YkCi95', 3: 'EsHiLiVoSGPzsfDRi9TeQrbCDAZQZUiheKwxJuft1LZb', 4: '4N91EcAxEaP2JRq2ULVUYwcNZgSbE5eAbtrW8nvppvRY', 5: 'Epq9KpGDgUqkJDd3CqkBu5uHVpEEsCH5Cyppw5sGuoPh' },
   // Buy back & burn: your main coin's mint address, and what share of YOUR platform fees goes to buybacks.
-  CLAIM_MINT: '',
+  CLAIM_MINT: 'C8g9TLh8QNncMq1JQtCFcEENGjrSVP2LvUbmkDPLpump',
   CLAIM_TICKER: 'CLAIM',
   CLAIM_START_SUPPLY: 1000000000,
   BUYBACK_PCT: 20,              // share of the platform fee used for buyback & burn (20% of 1.25% = 0.25% of every trade)
@@ -169,9 +169,13 @@ window.SITE = {
   .how b{font-family:var(--display);font-weight:400;font-size:28px;line-height:1;color:var(--accent);flex:none;width:18px}
   @media(max-width:820px){.hero{flex-direction:column;align-items:stretch}.how{width:auto}}
   .banner{display:flex;flex-wrap:wrap;background:var(--accent);color:var(--accent-ink);font-family:var(--display);font-size:22px;letter-spacing:.06em;text-transform:uppercase;margin:0 0 22px}
-  .banner > span{padding:12px 24px;border-right:3px solid var(--bg)} .banner > span:last-child{border-right:0}
+  .banner > span{padding:12px 18px;border-right:3px solid var(--bg)} .banner > span:last-child{border-right:0}
   .banner #burnBar[hidden]{display:none}
   .banner #burnSub{display:none}
+  .banner #caBox{cursor:pointer;font-family:inherit} .banner #caBox b{font-family:var(--mono, monospace);font-size:15px;letter-spacing:0;font-weight:700}
+  .banner #buyClaim{margin-left:auto;padding:12px 18px;white-space:nowrap;background:var(--bg);color:var(--accent);text-decoration:none;border:3px solid var(--accent)}
+  .banner #buyClaim:hover{background:var(--accent-ink);color:var(--accent)}
+  .banner [hidden]{display:none !important}
   .filters{display:flex;gap:8px;flex-wrap:wrap}
   .filters button{font-size:12px;padding:9px 14px;background:transparent;color:var(--text);border:2px solid var(--line)}
   .filters button.on{background:var(--text);color:var(--bg);border-color:var(--text)}
@@ -263,6 +267,8 @@ window.SITE = {
       <span id="burnBar" hidden><span id="burnNum">—</span> burned<span id="burnSub"></span></span>
       <span><b id="bnCoins">0</b> coins live</span>
       <span><b id="bnIns">0</b> insured</span>
+      <span id="caBox" hidden title="Click to copy the $CLAIM contract address">CA <b id="caTxt"></b></span>
+      <a id="buyClaim" hidden target="_blank" rel="noopener">Buy $CLAIM ↗</a>
     </div>
     <div class="listhead">
       <h2>Live coins</h2>
@@ -1083,6 +1089,15 @@ function updateBuybackUI(){
   $('bbAmt').value = (Number(pendingBuyback) / LAMPORTS_PER_SOL).toFixed(6);
   $('bbPending').textContent = pendingBuyback > 0n ? `Set aside from claims this session: ${sol(pendingBuyback)} SOL` : '';
 }
+function showClaimLinks(){
+  const mint = SITE.CLAIM_MINT; if (!mint) return;
+  $('caTxt').textContent = short(mint); $('caBox').hidden = false;
+  $('caBox').onclick = async () => { try { await navigator.clipboard.writeText(mint); log('Copied the $' + SITE.CLAIM_TICKER + ' contract address.', 'ok'); } catch(e){ prompt('Contract address:', mint); } };
+  $('buyClaim').textContent = `Buy $${SITE.CLAIM_TICKER} ↗`;
+  $('buyClaim').href = mint.endsWith('pump') ? `https://pump.fun/coin/${mint}` : `https://jup.ag/swap/SOL-${mint}`;
+  $('buyClaim').hidden = false;
+}
+showClaimLinks();
 async function loadBurnLedger(){
   const mint = SITE.CLAIM_MINT; if (!mint) return;
   try {
@@ -1131,14 +1146,22 @@ $('bbBtn').onclick = async () => {
       body: JSON.stringify({ quoteResponse: quote, userPublicKey: wallet.toBase58(), wrapAndUnwrapSol: true, dynamicComputeUnitLimit: true,
         prioritizationFeeLamports: { priorityLevelWithMaxLamports: { maxLamports: 1_000_000, priorityLevel: 'high' } } }) });
     if (!sw.ok) throw new Error(`Jupiter swap failed (${sw.status}): ${await sw.text()}`);
-    const { swapTransaction } = await sw.json();
+    const swapResp = await sw.json(); const { swapTransaction } = swapResp;
     const vtx = web3.VersionedTransaction.deserialize(Buffer.from(swapTransaction, 'base64'));
     log('Buying… approve in Phantom (1/2)');
     const signed = await provider.signTransaction(vtx);
-    const sig = await connection.sendRawTransaction(signed.serialize(), { maxRetries: 3 });
-    const bh = await connection.getLatestBlockhash('confirmed');
-    const conf = await connection.confirmTransaction({ signature: sig, ...bh }, 'confirmed');
-    if (conf.value.err) throw new Error('Buy failed on-chain: ' + JSON.stringify(conf.value.err));
+    const raw = signed.serialize();
+    const sig = await connection.sendRawTransaction(raw, { skipPreflight: true, maxRetries: 0 });
+    const resend = setInterval(() => connection.sendRawTransaction(raw, { skipPreflight: true, maxRetries: 0 }).catch(() => {}), 2000);
+    try {
+      const fresh = await connection.getLatestBlockhash('confirmed');
+      const conf = await connection.confirmTransaction({ signature: sig, blockhash: vtx.message?.recentBlockhash || fresh.blockhash,
+        lastValidBlockHeight: swapResp.lastValidBlockHeight || fresh.lastValidBlockHeight }, 'confirmed');
+      if (conf.value.err) throw new Error('Buy failed on-chain: ' + JSON.stringify(conf.value.err));
+    } catch(e){
+      if (/expired|block height exceeded/i.test(e.message || '')) throw new Error("Solana was busy and the buy didn't go through. Nothing was spent. Try again.");
+      throw e;
+    } finally { clearInterval(resend); }
     log(`Bought. https://solscan.io/tx/${sig}${cl}`, 'ok');
     // 3. burn exactly what was bought
     let accts = [], after = before;
