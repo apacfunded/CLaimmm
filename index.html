@@ -86,6 +86,9 @@ h1 em{font-style:italic;background:var(--grad);-webkit-background-clip:text;back
 .pour .btn{height:48px;border-radius:16px}
 .ca{display:inline-flex;align-items:center;gap:10px;margin-top:18px;padding:8px 14px;border-radius:999px;border:1px dashed var(--line-2);font-size:13px;color:var(--ink-2)}
 .ca b{font-weight:700;color:var(--ink)}
+.ca{flex-wrap:wrap;justify-content:center;max-width:100%}
+#caText{word-break:break-all}
+.cacopy{font-weight:700;font-size:12px;padding:4px 10px;border-radius:999px;background:var(--ink);color:var(--cream)}
 
 /* ---------- ticker ---------- */
 .ticker{margin:36px 0 34px;border-block:1.5px solid var(--ink);background:var(--ink);color:var(--cream);overflow:hidden;white-space:nowrap}
@@ -287,7 +290,7 @@ footer .brand{justify-content:center;color:var(--ink);margin-bottom:8px}
           <div class="in"><span>@</span><input id="heroHandle" placeholder="who should get paid?" autocomplete="off"></div>
           <button class="btn hot" id="heroGo">Pour a coin</button>
         </div>
-        <div class="ca"><b>$CIDER</b><span class="mono" id="caText">CA dropping soon</span></div>
+        <div class="ca"><b>$CIDER</b><span class="mono" id="caText">DUU9MN8NSP5FvCRoYZXoRxftAm948KyBvBAMResWpump</span><button class="cacopy" id="caCopy" type="button">Copy</button><a class="cacopy" href="https://pump.fun/coin/DUU9MN8NSP5FvCRoYZXoRxftAm948KyBvBAMResWpump" target="_blank" rel="noopener">pump.fun ↗</a></div>
       </div>
     </div>
 
@@ -544,6 +547,7 @@ $("#walletBtn").onclick=async()=>{const p=window.phantom?.solana||window.solana;
   try{const r=await p.connect(),k=r.publicKey.toString();$("#walletBtn").textContent=k.slice(0,4)+"…"+k.slice(-4)}catch{toast("Wallet connection cancelled")}};
 
 $("#lSplit").value=CONFIG.defaultSplit;$("#yr").textContent=new Date().getFullYear();
+$("#caCopy").onclick=()=>{copyText("DUU9MN8NSP5FvCRoYZXoRxftAm948KyBvBAMResWpump");toast("Contract address copied")};
 renderTicker();renderBoard();renderTicket();
 </script>
 </body>
