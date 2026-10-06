@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Samuri — Your AI film crew</title>
+<meta name="description" content="Samuri is your AI film crew: it writes the prompts, checks every take, and cuts the final video.">
+<link rel="icon" href="favicon.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;800&amp;family=Zen+Kaku+Gothic+New:wght@400;500;700;900&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0E0D0C}
+a{color:#B8B1A3;text-decoration:none}a:hover{color:#FFFFFF}
+input:focus,button:focus-visible,a:focus-visible{outline:2px solid #E24A2B;outline-offset:2px}
+input::placeholder{color:#8A8478}
+@keyframes samuri-blink{0%,49%{opacity:1}50%,100%{opacity:0}}
+</style>
+
+</head>
+<body>
+
+
+<div id="top" style="min-height: 100vh; background: #0E0D0C; color: #E9E4D8; font-family: 'Zen Kaku Gothic New', system-ui, sans-serif; font-size: 16px; line-height: 1.55">
+
+<header style="border-bottom: 1px solid #2A2724">
+<div style="max-width: 1200px; margin: 0 auto; padding: 18px 24px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px">
+<a href="#top" aria-label="Samuri home" style="display: flex; align-items: center; gap: 12px">
+<svg width="40" height="40" viewBox="0 0 140 140" aria-hidden="true">
+<rect x="0" y="0" width="140" height="140" rx="32" fill="#F4EFE3"></rect>
+<path d="M30 46 L30 30 L46 30 M94 30 L110 30 L110 46 M110 94 L110 110 L94 110 M46 110 L30 110 L30 94" stroke="#0E0D0C" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"></path>
+<circle cx="70" cy="70" r="26" fill="#C8361A"></circle>
+<path d="M38 102 L102 38" stroke="#0E0D0C" stroke-width="10" stroke-linecap="round"></path>
+</svg>
+<span style="font-weight: 900; font-size: 24px; letter-spacing: -0.02em; color: #F4EFE3">samuri</span>
+</a>
+<nav aria-label="Main" style="display: flex; flex-wrap: wrap; align-items: center; gap: 4px">
+<a href="#how" style="padding: 10px 14px; font-size: 15px">How it works</a>
+<a href="#checks" style="padding: 10px 14px; font-size: 15px">What it checks</a>
+<a href="#film" style="padding: 10px 14px; font-size: 15px">Watch</a>
+<a href="#join" style="min-height: 44px; padding: 0 18px; margin-left: 8px; border-radius: 22px; background: #C8361A; color: #FFFFFF; font-weight: 700; font-size: 15px; display: flex; align-items: center">Get early access</a>
+</nav>
+</div>
+</header>
+
+<main>
+
+<section style="max-width: 1200px; margin: 0 auto; padding: 72px 24px 56px; display: flex; flex-wrap: wrap; align-items: center; gap: 56px">
+<div style="flex: 999 1 460px; min-width: 0; display: flex; flex-direction: column; gap: 26px">
+<span style="align-self: flex-start; font-family: 'JetBrains Mono', monospace; font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: #F4EFE3; border: 1px solid #C8361A; border-radius: 4px; padding: 6px 12px">Coming soon · [LAUNCH DATE]</span>
+<h1 style="margin: 0; font-family: 'Shippori Mincho B1', serif; font-weight: 800; font-size: clamp(44px, 7vw, 84px); line-height: 1.02; color: #F4EFE3">Your AI<br>film crew.</h1>
+<p style="margin: 0; max-width: 540px; color: #B8B1A3; font-size: 19px">Describe the video you want. Samuri writes the prompts, checks every take, fixes the bad ones, and cuts it together with music, ready to post.</p>
+<div aria-label="Example request" style="background: #171513; border: 1px solid #2A2724; border-radius: 10px; padding: 16px 18px; font-family: 'JetBrains Mono', monospace; font-size: 14px; color: #E9E4D8; display: flex; gap: 10px; max-width: 540px">
+<span style="color: #C8361A">›</span>
+<span>a samurai cat and a knight kitten face off in a storm, then the camera rises to the sky<span style="display: inline-block; width: 8px; height: 16px; margin-left: 4px; vertical-align: -2px; background: #C8361A; animation: samuri-blink 1s steps(1) infinite"></span></span>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 12px">
+<a href="#join" style="min-height: 52px; padding: 0 26px; border-radius: 8px; background: #C8361A; color: #FFFFFF; font-weight: 700; font-size: 16px; display: flex; align-items: center">Draw your sword</a>
+<a href="#film" style="min-height: 52px; padding: 0 22px; border-radius: 8px; border: 1px solid #3A3631; color: #E9E4D8; font-weight: 500; font-size: 16px; display: flex; align-items: center; gap: 10px">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 4v16l13-8z"></path></svg>
+Watch the film
+</a>
+</div>
+</div>
+
+<figure id="film" style="flex: 1 1 400px; min-width: 0; margin: 0; display: flex; flex-direction: column; gap: 12px">
+<div style="border-radius: 14px; overflow: hidden; border: 1px solid #2A2724; background: #1E1C1A; aspect-ratio: 1 / 1">
+<video src="samuri-film.mp4" poster="poster.png" controls playsinline muted loop autoplay preload="metadata" style="width: 100%; height: 100%; object-fit: cover; display: block"></video>
+</div>
+<figcaption style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #8A8478">
+<span>Made with Samuri · 4 shots · 16s</span>
+<span>Tap for sound</span>
+</figcaption>
+</figure>
+</section>
+
+<section id="how" aria-labelledby="how-h" style="border-top: 1px solid #2A2724">
+<div style="max-width: 1200px; margin: 0 auto; padding: 72px 24px">
+<span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: #C8361A">How it works</span>
+<h2 id="how-h" style="margin: 12px 0 40px; font-family: 'Shippori Mincho B1', serif; font-weight: 800; font-size: clamp(32px, 4vw, 48px); line-height: 1.1; color: #F4EFE3">From one line to a final cut.</h2>
+<ol style="list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px">
+<li style="background: #171513; border: 1px solid #2A2724; border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 10px">
+<span style="font-family: 'Shippori Mincho B1', serif; font-weight: 800; font-size: 28px; color: #C8361A">一</span>
+<h3 style="margin: 0; font-size: 20px; color: #F4EFE3">Write</h3>
+<p style="margin: 0; color: #B8B1A3; font-size: 15px">Tell Samuri the story. It plans the shots and writes prompts sized to pass each model's limits.</p>
+</li>
+<li style="background: #171513; border: 1px solid #2A2724; border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 10px">
+<span style="font-family: 'Shippori Mincho B1', serif; font-weight: 800; font-size: 28px; color: #C8361A">二</span>
+<h3 style="margin: 0; font-size: 20px; color: #F4EFE3">Shoot</h3>
+<p style="margin: 0; color: #B8B1A3; font-size: 15px">Each shot is generated, with the last frame of one carried into the next so scenes connect.</p>
+</li>
+<li style="background: #171513; border: 1px solid #2A2724; border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 10px">
+<span style="font-family: 'Shippori Mincho B1', serif; font-weight: 800; font-size: 28px; color: #C8361A">三</span>
+<h3 style="margin: 0; font-size: 20px; color: #F4EFE3">Check</h3>
+<p style="margin: 0; color: #B8B1A3; font-size: 15px">Every take is reviewed. Anything off gets fixed or reshot before you ever see it.</p>
+</li>
+<li style="background: #171513; border: 1px solid #2A2724; border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 10px">
+<span style="font-family: 'Shippori Mincho B1', serif; font-weight: 800; font-size: 28px; color: #C8361A">四</span>
+<h3 style="margin: 0; font-size: 20px; color: #F4EFE3">Cut</h3>
+<p style="margin: 0; color: #B8B1A3; font-size: 15px">Shots are joined, sized to match, and set to your music. One file, ready to post.</p>
+</li>
+</ol>
+</div>
+</section>
+
+<section id="checks" aria-labelledby="checks-h" style="border-top: 1px solid #2A2724">
+<div style="max-width: 1200px; margin: 0 auto; padding: 72px 24px; display: flex; flex-wrap: wrap; gap: 48px">
+<div style="flex: 1 1 340px; min-width: 0; display: flex; flex-direction: column; gap: 14px">
+<span style="font-family: 'JetBrains Mono', monospace; font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: #C8361A">What it checks</span>
+<h2 id="checks-h" style="margin: 0; font-family: 'Shippori Mincho B1', serif; font-weight: 800; font-size: clamp(32px, 4vw, 48px); line-height: 1.1; color: #F4EFE3">Every take, checked.</h2>
+<p style="margin: 0; color: #B8B1A3; font-size: 17px; max-width: 420px">AI clips come back with small problems that wreck a finished video. Samuri catches them so you don't spend hours fixing them by hand.</p>
+</div>
+<ul style="flex: 999 1 520px; min-width: 0; list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; border-top: 1px solid #2A2724">
+<li style="display: flex; gap: 16px; padding: 18px 0; border-bottom: 1px solid #2A2724">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C8361A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 3px"><path d="M5 12l5 5L20 7"></path></svg>
+<div><strong style="color: #F4EFE3; font-weight: 700">Rejected prompts.</strong> <span style="color: #B8B1A3">Rewritten to fit length limits and filters, so they go through the first time.</span></div>
+</li>
+<li style="display: flex; gap: 16px; padding: 18px 0; border-bottom: 1px solid #2A2724">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C8361A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 3px"><path d="M5 12l5 5L20 7"></path></svg>
+<div><strong style="color: #F4EFE3; font-weight: 700">Mismatched sizes and black bars.</strong> <span style="color: #B8B1A3">Every shot cropped and scaled to the same frame.</span></div>
+</li>
+<li style="display: flex; gap: 16px; padding: 18px 0; border-bottom: 1px solid #2A2724">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C8361A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 3px"><path d="M5 12l5 5L20 7"></path></svg>
+<div><strong style="color: #F4EFE3; font-weight: 700">Characters that drift.</strong> <span style="color: #B8B1A3">Same fur, same armor, same face from the first shot to the last.</span></div>
+</li>
+<li style="display: flex; gap: 16px; padding: 18px 0; border-bottom: 1px solid #2A2724">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C8361A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 3px"><path d="M5 12l5 5L20 7"></path></svg>
+<div><strong style="color: #F4EFE3; font-weight: 700">Takes that miss the brief.</strong> <span style="color: #B8B1A3">If the camera moved when it shouldn't, or the wind isn't blowing, it gets reshot.</span></div>
+</li>
+<li style="display: flex; gap: 16px; padding: 18px 0; border-bottom: 1px solid #2A2724">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C8361A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 3px"><path d="M5 12l5 5L20 7"></path></svg>
+<div><strong style="color: #F4EFE3; font-weight: 700">Music that doesn't fit.</strong> <span style="color: #B8B1A3">Trimmed, faded, and laid under the scene's own sound.</span></div>
+</li>
+</ul>
+</div>
+</section>
+
+<section id="join" aria-labelledby="join-h" style="border-top: 1px solid #2A2724">
+<div style="max-width: 720px; margin: 0 auto; padding: 88px 24px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 20px">
+<h2 id="join-h" style="margin: 0; font-family: 'Shippori Mincho B1', serif; font-weight: 800; font-size: clamp(36px, 5vw, 60px); line-height: 1.05; color: #F4EFE3">Write the scene.<br>Samuri does the rest.</h2>
+<p style="margin: 0; color: #B8B1A3; font-size: 18px">Join the waitlist. First on the list get free credits at launch.</p>
+
+<form id="waitlist" style="width: 100%; max-width: 520px; display: flex; flex-direction: column; gap: 8px; text-align: left">
+<label for="email" style="font-size: 14px; font-weight: 500; color: #B8B1A3">Email</label>
+<div style="display: flex; flex-wrap: wrap; gap: 10px">
+<input id="email" type="email" placeholder="you@email.com" style="flex: 1 1 240px; min-width: 0; min-height: 52px; box-sizing: border-box; padding: 0 16px; border-radius: 8px; border: 1px solid #3A3631; background: #0E0D0C; color: #F4EFE3; font-family: inherit; font-size: 16px">
+<button type="submit" style="flex: 0 0 auto; min-height: 52px; padding: 0 24px; border-radius: 8px; border: none; background: #C8361A; color: #FFFFFF; font-family: inherit; font-size: 16px; font-weight: 700; cursor: pointer">Join the waitlist</button>
+</div>
+</form>
+
+
+<div id="joined" hidden role="status" style="border: 1px solid #C8361A; border-radius: 8px; padding: 16px 20px; color: #F4EFE3">You're in. We'll send word the moment the doors open.</div>
+
+</div>
+</section>
+
+</main>
+
+<footer style="border-top: 1px solid #2A2724">
+<div style="max-width: 1200px; margin: 0 auto; padding: 22px 24px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; font-size: 13px; color: #8A8478">
+<span>© Samuri</span>
+<span style="font-family: 'Shippori Mincho B1', serif; font-size: 15px; color: #B8B1A3">刀を抜け — draw your sword.</span>
+<a href="https://x.com/" style="min-height: 44px; display: flex; align-items: center">Follow on X</a>
+</div>
+</footer>
+
+</div>
+
+<script>
+document.getElementById('waitlist').addEventListener('submit',function(e){e.preventDefault();this.hidden=true;document.getElementById('joined').hidden=false;});
+</script>
+</body>
+</html>
