@@ -40,6 +40,8 @@ window.SITE = {
   // Callout moderation: wallets or transaction signatures whose callouts are hidden on your site.
   HIDDEN_WALLETS: [],
   HIDDEN_CALLOUTS: [],
+  // Coins to leave off the Coins page: a mint address, or '$TICKER'. They stay on-chain and Admin can still collect their fees.
+  HIDDEN_COINS: ['$CLAIM'],
 };
 </script>
 <style>
@@ -1002,9 +1004,10 @@ async function loadCoins(){
       c.migrated = ps(c.pool).isMigrated === 1 || c.progress >= 1;
     }
     all.sort((a, b) => b.mcap - a.mcap);
-    coins = all;
-    $('bnCoins').textContent = all.length.toLocaleString();
-    $('bnIns').textContent = all.filter(c => c.ins > 0).length.toLocaleString();
+    coins = all;   // every coin (Admin still sees hidden ones)
+    const shownCoins = all.filter(isShown);
+    $('bnCoins').textContent = shownCoins.length.toLocaleString();
+    $('bnIns').textContent = shownCoins.filter(c => c.ins > 0).length.toLocaleString();
     renderGrid();
   } catch(e){ $('coinGrid').innerHTML = `<div class="empty">Couldn't load coins: ${esc(e.message)}<br>Make sure SITE.RPC_URL is a Helius/QuickNode URL.</div>`; }
 }
@@ -1021,11 +1024,13 @@ document.querySelectorAll('.filters [data-filter]').forEach(b => b.onclick = () 
   renderGrid();
 });
 $('heroInsured').onclick = () => { document.querySelector('.filters [data-filter=insured]').click(); document.querySelector('.listhead').scrollIntoView({ behavior: 'smooth' }); };
+function isShown(c){ const h = SITE.HIDDEN_COINS || []; return !(h.includes(c.mint) || h.includes('$' + (c.meta?.symbol || '').replace(/\0/g,'').trim())); }
 function renderGrid(){
-  if (!coins.length){ $('coinGrid').innerHTML = '<div class="empty">No coins yet. Be the first to file one.</div>'; $('coinCount').textContent = ''; return; }
-  const shown = coins.map((c, i) => [c, i]).filter(([c]) => FILTERS[gridFilter](c));
+  const total = coins.filter(isShown).length;
+  if (!total){ $('coinGrid').innerHTML = '<div class="empty">No coins yet. Be the first to file one.</div>'; $('coinCount').textContent = ''; return; }
+  const shown = coins.map((c, i) => [c, i]).filter(([c]) => isShown(c) && FILTERS[gridFilter](c));
   if (gridFilter === 'new') shown.sort((a, b) => a[0].progress - b[0].progress);
-  $('coinCount').textContent = `Showing ${shown.length} of ${coins.length} coin${coins.length === 1 ? '' : 's'}`;
+  $('coinCount').textContent = `Showing ${shown.length} of ${total} coin${total === 1 ? '' : 's'}`;
   if (!shown.length){ $('coinGrid').innerHTML = '<div class="empty">Nothing here yet.</div>'; return; }
   $('coinGrid').innerHTML = shown.map(([c, i]) => `
     <div class="coin" data-i="${i}">
