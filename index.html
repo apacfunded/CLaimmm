@@ -25,7 +25,9 @@ window.SITE = {
   WEBSITE: 'https://claimpad.lol',
   LOGO_URL: 'https://claimpad.lol/claim-pfp.png',
   // Your wallet. Receives the platform fee and runs the Admin tab.
-  PLATFORM_WALLET: '2CfTfLqtSKCuzZacgrPuysJmtNJ35fj5jRCzFdJ9D7QX',
+  PLATFORM_WALLET: 'Dhxr6cMPUGaSMAqBstrLndnGeeBz9ST4Q5UggJvA9vHy',
+  // Other wallets allowed into Admin (the old fee wallet, to claim fees on coins launched before the switch).
+  ADMIN_WALLETS: ['2CfTfLqtSKCuzZacgrPuysJmtNJ35fj5jRCzFdJ9D7QX'],
   // A Helius or QuickNode RPC URL (the public RPC blocks the lookups this site needs).
   RPC_URL: 'https://mainnet.helius-rpc.com/?api-key=79745eb0-88f9-4d0b-b3af-32214c25a10a',
   // Pinata JWT used for coin images. Use a key limited to file uploads only — it is visible to visitors.
@@ -33,7 +35,9 @@ window.SITE = {
   // What you keep from every trade, after Meteora's cut.
   NET_PLATFORM_FEE_PCT: 1.25,   // 1% to you + 0.25% to $CLAIM buyback & burn
   // Filled in by Admin → Setup. One fee config per insurance level (0 = no insurance).
-  CONFIGS: { 0: '4w4TGnMdync9foqUeCuqgW4o5fst62SDDTMhRKiRXtVS', 1: 'F7mEVHMkU7GivdPemv2myuPyTsJ2NzxszCi8RKSP1zeA', 2: '2CSMfYoxS2HTNrtAAW9beCgZt98nWy8o4UjCS9YkCi95', 3: 'EsHiLiVoSGPzsfDRi9TeQrbCDAZQZUiheKwxJuft1LZb', 4: '4N91EcAxEaP2JRq2ULVUYwcNZgSbE5eAbtrW8nvppvRY', 5: 'Epq9KpGDgUqkJDd3CqkBu5uHVpEEsCH5Cyppw5sGuoPh' },
+  CONFIGS: {},
+  // Older fee configs (fee wallet 2CfT…D7QX). Coins launched on these still show on the site; no new launches use them.
+  OLD_CONFIGS: { 0: '4w4TGnMdync9foqUeCuqgW4o5fst62SDDTMhRKiRXtVS', 1: 'F7mEVHMkU7GivdPemv2myuPyTsJ2NzxszCi8RKSP1zeA', 2: '2CSMfYoxS2HTNrtAAW9beCgZt98nWy8o4UjCS9YkCi95', 3: 'EsHiLiVoSGPzsfDRi9TeQrbCDAZQZUiheKwxJuft1LZb', 4: '4N91EcAxEaP2JRq2ULVUYwcNZgSbE5eAbtrW8nvppvRY', 5: 'Epq9KpGDgUqkJDd3CqkBu5uHVpEEsCH5Cyppw5sGuoPh' },
   // Buy back & burn: your main coin's mint address, and what share of YOUR platform fees goes to buybacks.
   // Paste the new $CLAIM contract address (CA) from pump.fun here. Empty = the $CLAIM spot shows "launching soon".
   CLAIM_MINT: '',
@@ -43,7 +47,7 @@ window.SITE = {
   CLAIM_START_SUPPLY: 1000000000,
   BUYBACK_PCT: 20,              // share of the platform fee used for buyback & burn (20% of 1.25% = 0.25% of every trade)
   // Wallet that holds insurance money (the bot sends each coin's insurance share here, tagged per coin).
-  INSURANCE_WALLET: '',
+  INSURANCE_WALLET: 'Dhxr6cMPUGaSMAqBstrLndnGeeBz9ST4Q5UggJvA9vHy',
   // Callout moderation: wallets or transaction signatures whose callouts are hidden on your site.
   HIDDEN_WALLETS: [],
   HIDDEN_CALLOUTS: [],
@@ -458,7 +462,7 @@ pre.snip{background:var(--field);border:1px solid var(--line2);border-radius:var
     <button id="connectBtn" class="ghost small">Connect Phantom</button>
   </header>
 
-  <div id="setupBanner" class="card warn" hidden style="margin-top:20px">This launchpad isn't set up yet. The owner needs to open <b>Admin</b> and run setup.</div>
+  <div id="setupBanner" class="card warn" hidden style="margin-top:20px">New coin launches are paused for a quick upgrade. Trading on existing coins works as normal.</div>
 
   <!-- EXPLORE -->
   <section class="view on" id="view-explore">
@@ -861,7 +865,7 @@ const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&l
 const sol = (lamports, d = 4) => (Number(lamports) / LAMPORTS_PER_SOL).toLocaleString(undefined, { maximumFractionDigits: d });
 const fmtNum = n => n >= 1e9 ? (n/1e9).toFixed(2)+'B' : n >= 1e6 ? (n/1e6).toFixed(2)+'M' : n >= 1e3 ? (n/1e3).toFixed(1)+'K' : n.toFixed(2);
 const grossPct = ins => (SITE.NET_PLATFORM_FEE_PCT + ins) / (1 - PROTOCOL_CUT);
-const levelOfConfig = addr => { for (const [k, v] of Object.entries(SITE.CONFIGS)) if (v && v === addr) return Number(k); return null; };
+const levelOfConfig = addr => { for (const set of [SITE.CONFIGS, SITE.OLD_CONFIGS || {}]) for (const [k, v] of Object.entries(set)) if (v && v === addr) return Number(k); return null; };
 const lpMark = (ins = 0) => ins
   ? `<span class="lp-mark insured" title="${ins}% insurance: pays holders who are down">Insured</span>`
   : (safeUrl(SITE.LOGO_URL) ? `<img class="lp-mark" src="${esc(SITE.LOGO_URL)}" alt="${esc(SITE.NAME)}" title="Launched on ${esc(SITE.NAME)}">` : `<span class="lp-mark" title="Launched on ${esc(SITE.NAME)}">${esc(SITE.NAME)}</span>`);
@@ -988,7 +992,7 @@ function priceLamportsPerToken(pool){ // SOL per whole token as Decimal
 
 // ---------- coin list ----------
 async function loadCoins(){
-  const entries = Object.entries(SITE.CONFIGS).filter(([, v]) => v);
+  const entries = [...Object.entries(SITE.CONFIGS), ...Object.entries(SITE.OLD_CONFIGS || {})].filter(([, v]) => v);
   if (!entries.length){ $('coinGrid').innerHTML = '<div class="empty">No coins yet. The site owner needs to finish setup in Admin.</div>'; return; }
   $('coinGrid').innerHTML = '<div class="empty">Loading coins…</div>';
   try {
@@ -1291,7 +1295,7 @@ $('launchBtn').onclick = async () => {
   const description = $('description').value.trim(), file = $('image').files[0];
   const dev = parseFloat($('devBuy').value || '0') || 0;
   const insLevel = window.insLevel; const config = SITE.CONFIGS[insLevel];
-  if (!config) return log('This insurance level is not set up on the site yet.', 'err');
+  if (!config) return log('New launches are paused for a quick upgrade. Check back soon.', 'err');
   if (!name || !symbol) return log('Name and ticker are required.', 'err');
   if (!file) return log('Pick an image.', 'err');
   if (!confirm(`Launch ${name} ($${symbol})\nInsurance: ${insLevel ? insLevel + '%' : 'none'}\nTrading fee: ${grossPct(insLevel).toFixed(3)}%\nDev buy: ${dev} SOL`)) return;
@@ -1325,7 +1329,7 @@ $('launchBtn').onclick = async () => {
 };
 
 // ---------- admin: setup ----------
-const isAdmin = () => wallet && (!SITE.PLATFORM_WALLET || SITE.PLATFORM_WALLET === wallet.toBase58() || (SITE.INSURANCE_WALLET && SITE.INSURANCE_WALLET === wallet.toBase58()));
+const isAdmin = () => wallet && (!SITE.PLATFORM_WALLET || SITE.PLATFORM_WALLET === wallet.toBase58() || (SITE.INSURANCE_WALLET && SITE.INSURANCE_WALLET === wallet.toBase58()) || (SITE.ADMIN_WALLETS || []).includes(wallet.toBase58()));
 const isInsuranceWallet = () => wallet && SITE.INSURANCE_WALLET && SITE.INSURANCE_WALLET === wallet.toBase58();
 const MEMO_PROGRAM = new PublicKey('MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr');
 const MEMO_IN = 'claim-ins:', MEMO_PAID = 'claim-paid:';
