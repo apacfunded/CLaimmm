@@ -28,7 +28,10 @@ window.SITE = {
   // Filled in by Admin → Setup. One fee config per insurance level (0 = no insurance).
   CONFIGS: { 0: '4w4TGnMdync9foqUeCuqgW4o5fst62SDDTMhRKiRXtVS', 1: 'F7mEVHMkU7GivdPemv2myuPyTsJ2NzxszCi8RKSP1zeA', 2: '2CSMfYoxS2HTNrtAAW9beCgZt98nWy8o4UjCS9YkCi95', 3: 'EsHiLiVoSGPzsfDRi9TeQrbCDAZQZUiheKwxJuft1LZb', 4: '4N91EcAxEaP2JRq2ULVUYwcNZgSbE5eAbtrW8nvppvRY', 5: 'Epq9KpGDgUqkJDd3CqkBu5uHVpEEsCH5Cyppw5sGuoPh' },
   // Buy back & burn: your main coin's mint address, and what share of YOUR platform fees goes to buybacks.
-  CLAIM_MINT: 'C8g9TLh8QNncMq1JQtCFcEENGjrSVP2LvUbmkDPLpump',
+  // Paste the new $CLAIM contract address (CA) from pump.fun here. Empty = the $CLAIM spot shows "launching soon".
+  CLAIM_MINT: '',
+  // Project X / Twitter
+  X_URL: 'https://x.com/claim_insure',
   CLAIM_TICKER: 'CLAIM',
   CLAIM_START_SUPPLY: 1000000000,
   BUYBACK_PCT: 20,              // share of the platform fee used for buyback & burn (20% of 1.25% = 0.25% of every trade)
@@ -248,6 +251,38 @@ code{font-family:var(--mono);font-size:.92em;background:var(--field);padding:1px
 .revealed .weigh .track i{width:var(--w)}
 .ex{display:inline-block;font:400 12px/1 var(--mono);color:var(--muted);border:1px solid var(--line2);border-radius:99px;padding:5px 9px;margin-left:8px;vertical-align:3px;text-transform:none;letter-spacing:0}
 
+/* ---------- X link ---------- */
+.xlink{display:grid;place-items:center;width:44px;height:44px;border-radius:12px;border:1px solid var(--line2);color:var(--text);flex:none;transition:border-color .2s,background .2s}
+.xlink:hover{border-color:var(--accent);background:var(--card2)}
+.xlink svg{width:18px;height:18px}
+@media(max-width:520px){.xlink{width:40px;height:40px}}
+
+/* ---------- featured $CLAIM spot ---------- */
+.feature{position:relative;display:grid;grid-template-columns:auto 1fr;gap:32px;align-items:center;padding:28px;margin:0 0 8px;border-radius:20px;overflow:hidden;
+  background:linear-gradient(120deg,rgba(63,224,192,.13),rgba(15,33,36,.95) 45%);border:1px solid rgba(63,224,192,.35)}
+.feature::after{content:'';position:absolute;inset:-1px;border-radius:20px;pointer-events:none;
+  background:linear-gradient(110deg,transparent 30%,rgba(124,240,216,.12) 50%,transparent 70%);background-size:250% 100%;animation:sweep 5s linear infinite}
+@keyframes sweep{from{background-position:150% 0}to{background-position:-100% 0}}
+.f-art{position:relative;line-height:0}
+.f-art img{width:148px;height:148px;border-radius:28px;box-shadow:0 0 0 2px rgba(63,224,192,.4),0 24px 50px -20px rgba(63,224,192,.55);animation:bob 6s ease-in-out infinite}
+.f-no{position:absolute;left:50%;bottom:-12px;transform:translateX(-50%);font:500 12px/1 var(--mono);background:var(--bg);color:var(--accent);border:1px solid rgba(63,224,192,.5);padding:6px 10px;border-radius:99px;white-space:nowrap}
+.f-body{min-width:0}
+.f-body h3{font-size:clamp(30px,4vw,42px);letter-spacing:-.035em;margin:0 0 6px}
+.f-body p{margin:0;color:var(--soft);max-width:560px}
+.f-ca{display:flex;align-items:center;gap:10px;margin-top:16px;flex-wrap:wrap}
+.f-ca .lbl{font:500 12px/1 var(--mono);color:var(--muted);letter-spacing:.06em}
+.f-ca code{font:500 14px/1.4 var(--mono);color:var(--text);background:var(--field);border:1px solid var(--line2);padding:9px 12px;border-radius:10px;word-break:break-all}
+.feature .btns{margin-top:18px}
+.btn-a{display:inline-flex;align-items:center;min-height:46px;padding:0 20px;border-radius:var(--r-sm);background:var(--accent);color:var(--accent-ink);font:600 15px/1 var(--sans);text-decoration:none;transition:background .2s,box-shadow .2s}
+.btn-a:hover{background:var(--accent2);box-shadow:0 8px 24px -10px rgba(63,224,192,.55)}
+.btn-a.ghosty{background:transparent;color:var(--text);border:1px solid var(--line2)}
+.btn-a.ghosty:hover{border-color:var(--accent);background:var(--card2);box-shadow:none}
+.btn-a[hidden],.f-soon[hidden],.f-ca[hidden]{display:none}
+.f-soon{display:inline-flex;align-items:center;gap:9px;min-height:46px;padding:0 16px;border-radius:var(--r-sm);font:500 14px/1 var(--mono);color:var(--warn);background:rgba(245,197,107,.08);border:1px solid rgba(245,197,107,.35)}
+.f-soon i{width:8px;height:8px;border-radius:50%;background:var(--warn);animation:pingY 2s infinite}
+@keyframes pingY{0%{box-shadow:0 0 0 0 rgba(245,197,107,.6)}80%,100%{box-shadow:0 0 0 9px rgba(245,197,107,0)}}
+@media(max-width:640px){.feature{grid-template-columns:1fr;gap:26px;padding:22px}.f-art img{width:112px;height:112px;border-radius:22px}.f-no{left:56px}}
+
 /* ---------- coming soon ---------- */
 .soon{display:flex;align-items:center;gap:20px;flex-wrap:wrap;padding:20px 22px;margin:28px 0 0;border-radius:var(--r);border:1px dashed var(--line2);background:linear-gradient(110deg,rgba(15,33,36,.9),rgba(15,33,36,.5))}
 .soon-tag{font:500 12px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--warn);background:rgba(245,197,107,.1);border:1px solid rgba(245,197,107,.35);padding:7px 10px;border-radius:99px}
@@ -410,6 +445,7 @@ pre.snip{background:var(--field);border:1px solid var(--line2);border-radius:var
       <button data-view="coin" id="navCoin" hidden>Coin</button>
       <button data-view="admin">Admin</button>
     </nav>
+    <a class="xlink" id="xTop" href="https://x.com/claim_insure" target="_blank" rel="noopener" aria-label="claim on X (@claim_insure)" title="@claim_insure on X"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M17.75 3h3.07l-6.7 7.66L22 21h-6.17l-4.83-6.32L5.47 21H2.4l7.17-8.2L2 3h6.33l4.37 5.77L17.75 3zm-1.08 16.2h1.7L7.4 4.73H5.58L16.67 19.2z"/></svg></a>
     <button id="connectBtn" class="ghost small">Connect Phantom</button>
   </header>
 
@@ -463,6 +499,21 @@ pre.snip{background:var(--field);border:1px solid var(--line2);border-radius:var
       <div id="caBox" hidden title="Click to copy the $CLAIM contract address"><span class="val" id="caTxt"></span><span class="lbl">$CLAIM contract</span></div>
       <a id="buyClaim" hidden target="_blank" rel="noopener">Buy $CLAIM ↗</a>
     </div>
+
+    <section class="feature reveal" id="claimFeature" aria-label="The first coin on claim: $CLAIM">
+      <div class="f-art"><img src="claim-pfp.png" alt="$CLAIM logo" width="148" height="148"><span class="f-no">Coin #1</span></div>
+      <div class="f-body">
+        <span class="eyebrow">The first coin made on claim</span>
+        <h3>$CLAIM</h3>
+        <p>The coin behind the launchpad. Part of every trade on claim buys back and burns $CLAIM.</p>
+        <div class="f-ca" id="fCaRow" hidden><span class="lbl">CA</span><code id="fCa"></code><button class="small ghost" id="fCopy" type="button">Copy</button></div>
+        <div class="btns">
+          <a class="btn-a" id="fBuy" target="_blank" rel="noopener" hidden>Buy on pump.fun ↗</a>
+          <span class="f-soon" id="fSoon"><i></i>Launching on pump.fun soon</span>
+          <a class="btn-a ghosty" id="fX" href="https://x.com/claim_insure" target="_blank" rel="noopener">Follow @claim_insure for the CA</a>
+        </div>
+      </div>
+    </section>
 
     <div class="listhead">
       <h2><span class="livedot" aria-hidden="true"></span>Live coins</h2>
@@ -680,7 +731,7 @@ pre.snip{background:var(--field);border:1px solid var(--line2);border-radius:var
     <h2>Status</h2>
     <div id="log">Waiting…</div>
   </div>
-  <div class="foot"><span>claim · rug coverage on Solana</span><span>Memecoins are risky. Insurance pays from each coin's own pool, never more than it holds.</span></div>
+  <div class="foot"><span>claim · rug coverage on Solana · <a href="https://x.com/claim_insure" target="_blank" rel="noopener">@claim_insure on X</a></span><span>Memecoins are risky. Insurance pays from each coin's own pool, never more than it holds.</span></div>
 </div>
 
 <script>
@@ -1850,6 +1901,23 @@ const m = location.hash.match(/coin=([1-9A-HJ-NP-Za-km-z]{32,44})/); if (m) open
     });
     stage.addEventListener('pointerleave', () => { tk.style.transition = 'transform .6s ease'; tk.style.transform = ''; setTimeout(() => { tk.style.animation = ''; tk.style.transition = ''; }, 600); });
   }
+
+  /* ---- featured $CLAIM spot: "launching soon" until SITE.CLAIM_MINT is set ---- */
+  (() => {
+    const mint = (SITE.CLAIM_MINT || '').trim(), $ = id => document.getElementById(id);
+    if (SITE.X_URL){ ['xTop','fX'].forEach(id => $(id) && ($(id).href = SITE.X_URL)); }
+    if (!mint) return;
+    $('fSoon').hidden = true;
+    $('fCa').textContent = mint; $('fCaRow').hidden = false;
+    $('fBuy').href = mint.endsWith('pump') ? `https://pump.fun/coin/${mint}` : `https://jup.ag/swap/SOL-${mint}`;
+    $('fBuy').hidden = false;
+    $('fX').textContent = 'Follow @claim_insure';
+    $('fCopy').onclick = async () => {
+      try { await navigator.clipboard.writeText(mint); $('fCopy').textContent = 'Copied'; }
+      catch { prompt('Contract address:', mint); }
+      setTimeout(() => $('fCopy').textContent = 'Copy', 1600);
+    };
+  })();
 
   /* ---- scroll to top when switching views ---- */
   document.querySelectorAll('nav button, #heroFile').forEach(b => b.addEventListener('click', () => scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' })));
