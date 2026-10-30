@@ -956,7 +956,7 @@ nav button.on{background:transparent}
   $('image').addEventListener('change', () => { const f = $('image').files[0]; $('preview').innerHTML = f ? `<img src="${URL.createObjectURL(f)}" alt="">` : 'no image'; });
   document.title = SITE.NAME;
   $('siteName').innerHTML = (/^https?:\/\//.test(SITE.LOGO_URL) ? `<img src="${SITE.LOGO_URL.replace(/"/g,'')}" alt="" class="hlogo">` : '') + `<span>${SITE.NAME.replace(/[<>&"]/g,'')}</span>`;
-  if (!Object.values(SITE.CONFIGS).some(Boolean)) $('setupBanner').hidden = false;
+  // setup banner hidden by request; launches stay off until SITE.CONFIGS is filled
   // fee display (no libraries needed)
   const CUT = 0.20;
   window.insLevel = 0;
