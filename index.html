@@ -13,7 +13,7 @@
 <meta name="twitter:card" content="summary">
 <meta name="twitter:site" content="@claim_insure">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&family=Sora:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Geist+Mono:wght@400;500&family=Sora:wght@400;500;600&display=swap" rel="stylesheet">
 <script>
 /* ============================================================
    SITE SETTINGS — the only part you need to edit.
@@ -72,6 +72,7 @@ window.SITE = {
   --r:16px; --r-sm:10px;
   --shadow:0 1px 0 rgba(255,255,255,.03) inset, 0 12px 32px -18px rgba(0,0,0,.6);
   --sans:'Sora',ui-sans-serif,system-ui,-apple-system,'Segoe UI',sans-serif;
+  --display:'Anton',Impact,'Arial Narrow Bold',sans-serif;
   --mono:'Geist Mono',ui-monospace,Menlo,Consolas,monospace;
   --ease:cubic-bezier(.2,.8,.2,1);
 }
@@ -274,7 +275,7 @@ code{font-family:var(--mono);font-size:.92em;background:var(--field);padding:1px
 .feature{position:relative;display:grid;grid-template-columns:auto 1fr;gap:32px;align-items:center;padding:28px;margin:0 0 8px;border-radius:20px;overflow:hidden;
   background:linear-gradient(120deg,rgba(255,212,0,.13),rgba(21,21,21,.95) 45%);border:1px solid rgba(255,212,0,.35)}
 .feature::after{content:'';position:absolute;inset:-1px;border-radius:20px;pointer-events:none;
-  background:linear-gradient(110deg,transparent 30%,rgba(124,240,216,.12) 50%,transparent 70%);background-size:250% 100%;animation:sweep 5s linear infinite}
+  background:linear-gradient(110deg,transparent 30%,rgba(255,240,150,.14) 50%,transparent 70%);background-size:250% 100%;animation:sweep 5s linear infinite}
 @keyframes sweep{from{background-position:150% 0}to{background-position:-100% 0}}
 .f-art{position:relative;line-height:0}
 .f-art img{width:148px;height:148px;border-radius:28px;box-shadow:0 0 0 2px rgba(255,212,0,.4),0 24px 50px -20px rgba(255,212,0,.55);animation:bob 6s ease-in-out infinite}
@@ -431,7 +432,180 @@ pre.snip{background:var(--field);border:1px solid var(--line2);border-radius:var
 #stamp div.green{color:var(--accent);border-color:var(--accent)}
 @keyframes stampIn{0%{opacity:0;transform:rotate(-8deg) scale(2.2)}18%{opacity:1;transform:rotate(-8deg) scale(1)}80%{opacity:1;transform:rotate(-8deg) scale(1)}100%{opacity:0;transform:rotate(-8deg) scale(1)}}
 
+
+/* =====================================================================
+   v3 motion + identity layer (yellow & black)
+   ===================================================================== */
+html{overflow-x:clip}
+@media(max-width:640px){.ticket-ghost.g1{transform:rotate(-7deg) translate(-12px,14px)}.ticket-ghost.g2{transform:rotate(5deg) translate(14px,18px)}}
+/* scroll progress + pointer glow */
+#progress{position:fixed;left:0;top:0;height:3px;width:100%;transform-origin:0 50%;transform:scaleX(0);background:var(--accent);z-index:60;box-shadow:0 0 12px rgba(255,212,0,.7);pointer-events:none}
+#cursorGlow{position:fixed;left:0;top:0;width:520px;height:520px;margin:-260px 0 0 -260px;border-radius:50%;pointer-events:none;z-index:0;
+  background:radial-gradient(circle,rgba(255,212,0,.09),transparent 60%);transform:translate3d(-999px,-999px,0);transition:opacity .4s;opacity:0}
+body.glow-on #cursorGlow{opacity:1}
+
+/* sliding nav pill */
+nav{position:relative}
+nav button{position:relative;z-index:1}
+nav button.on{background:transparent}
+.navpill{position:absolute;top:4px;left:0;height:calc(100% - 8px);border-radius:999px;background:var(--accent);z-index:0;
+  transition:transform .45s cubic-bezier(.5,1.6,.4,1),width .45s cubic-bezier(.5,1.6,.4,1);box-shadow:0 6px 18px -8px rgba(255,212,0,.8)}
+
+/* brand mark wobble */
+.hlogo{transition:transform .5s cubic-bezier(.5,1.8,.4,1)}
+.brand:hover .hlogo{transform:rotate(-10deg) scale(1.12)}
+
+/* hero headline: heavy condensed display, masked word rise */
+.hero-h{font:400 clamp(66px,10.4vw,140px)/.88 var(--display);letter-spacing:.005em;text-transform:uppercase}
+.hero-h .l1,.hero-h .l2{overflow:hidden;padding:.06em 0 .02em;margin-bottom:-.04em}
+.hero-h .w{transform:translateY(105%) rotate(4deg);opacity:1;animation:wordMask 1s cubic-bezier(.2,.9,.2,1) forwards}
+.hero-h .l2 .w{animation:wordMask 1s cubic-bezier(.2,.9,.2,1) forwards,sheen 6s linear infinite}
+@keyframes wordMask{to{transform:none}}
+.hero-h .l2{position:relative}
+.scrib{position:absolute;left:0;bottom:.01em;width:100%;height:.22em;overflow:visible;pointer-events:none}
+.scrib path{fill:none;stroke:var(--accent);stroke-width:7;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:1;animation:draw 1.1s 1.1s cubic-bezier(.6,0,.2,1) forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.kicker{animation:fadeUp .8s .05s var(--ease) both}
+.hero p.lede{animation:fadeUp .8s .55s var(--ease) both}
+.hero .btns{animation:fadeUp .8s .7s var(--ease) both}
+.trust{animation:fadeUp .8s .85s var(--ease) both}
+.ticket-stage{animation:fadeIn 1.2s .3s var(--ease) both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+@keyframes fadeIn{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}
+.trust span{transition:color .2s}
+.trust span:hover{color:var(--text)}
+.trust span:hover svg{animation:wiggle .5s ease}
+@keyframes wiggle{25%{transform:rotate(-14deg)}75%{transform:rotate(12deg)}}
+
+/* primary buttons: shine sweep + magnet */
+.hero .btns button,.btn-a,.cta button{position:relative;overflow:hidden;will-change:transform}
+.hero .btns button:not(.ghost)::after,.btn-a:not(.ghosty)::after,.cta button::after{content:'';position:absolute;top:0;bottom:0;left:-60%;width:40%;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.75),transparent);transform:skewX(-20deg);animation:btnShine 3.8s 2s ease-in-out infinite}
+@keyframes btnShine{0%,70%{left:-60%}100%{left:130%}}
+.mag{transition:transform .35s cubic-bezier(.3,1.6,.5,1),background .2s,box-shadow .2s,border-color .2s}
+
+/* ticket stack + count + confetti */
+.ticket-ghost{position:absolute;width:min(380px,100%);height:330px;border-radius:18px;pointer-events:none}
+.ticket-ghost.g1{background:#1b1b1b;border:1px solid #2f2f2f;transform:rotate(-9deg) translate(-30px,18px);animation:ghostA 7s ease-in-out infinite}
+.ticket-ghost.g2{background:repeating-linear-gradient(-45deg,#0d0d0d 0 16px,#ffd400 16px 32px);opacity:.9;transform:rotate(7deg) translate(34px,26px);animation:ghostB 7s ease-in-out infinite;
+  -webkit-mask:linear-gradient(#000,#000);box-shadow:0 30px 60px -30px rgba(0,0,0,.8)}
+@keyframes ghostA{50%{transform:rotate(-12deg) translate(-40px,24px)}}
+@keyframes ghostB{50%{transform:rotate(10deg) translate(44px,30px)}}
+.ticket{z-index:2}
+.t-stamp{z-index:3}
+.ticket.thud{animation:thud .45s cubic-bezier(.3,1.8,.5,1)}
+@keyframes thud{0%{translate:0 0}30%{translate:0 6px;scale:.985}100%{translate:0 0;scale:1}}
+.confetto{position:absolute;left:var(--x);top:var(--y);width:var(--s);height:calc(var(--s)*.55);background:var(--c);border-radius:1px;z-index:4;pointer-events:none;
+  animation:confetto 1.4s cubic-bezier(.2,.7,.3,1) forwards}
+@keyframes confetto{0%{transform:translate(0,0) rotate(0);opacity:1}100%{transform:translate(var(--dx),var(--dy)) rotate(var(--r));opacity:0}}
+
+/* hazard tape marquee */
+.tape{position:relative;margin:8px calc(50% - 50vw) 44px;height:150px;pointer-events:none;user-select:none;overflow:hidden}
+@media(max-width:640px){.tape{height:110px;margin-bottom:28px}}
+.tape-row{position:absolute;left:-5%;right:-5%;overflow:hidden;display:flex;border-block:3px solid #0d0d0d}
+.tape-row.a{top:30px;background:var(--accent);transform:rotate(-2.2deg);z-index:2;box-shadow:0 20px 40px -20px rgba(0,0,0,.9)}
+.tape-row.b{top:48px;background:#0d0d0d;transform:rotate(2deg);border-color:var(--accent);opacity:.95}
+@media(max-width:640px){.tape-row.a{top:20px}.tape-row.b{top:34px}}
+.tape-track{display:flex;flex:none;gap:0;white-space:nowrap;animation:marq 38s linear infinite}
+.tape-row.b .tape-track{animation-direction:reverse;animation-duration:46s}
+.tape-track span{display:inline-flex;align-items:center;gap:22px;padding:14px 22px;font:400 30px/1 var(--display);text-transform:uppercase;letter-spacing:.02em;color:#0d0d0d}
+.tape-row.b .tape-track span{color:var(--accent)}
+.tape-track span::after{content:'';width:22px;height:22px;flex:none;background:currentColor;clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)}
+@media(max-width:640px){.tape-track span{font-size:22px;padding:11px 16px;gap:16px}.tape-track span::after{width:16px;height:16px}}
+@keyframes marq{to{transform:translateX(-50%)}}
+
+/* stat banner: count-up glow */
+.banner > *{position:relative;overflow:hidden}
+.banner > *::before{content:'';position:absolute;left:0;top:0;height:2px;width:100%;background:var(--accent);transform:scaleX(0);transform-origin:0 50%;transition:transform 1s var(--ease)}
+.banner.revealed > *::before{transform:scaleX(1)}
+.banner > *:nth-child(2)::before{transition-delay:.15s}.banner > *:nth-child(3)::before{transition-delay:.3s}.banner > *:nth-child(4)::before{transition-delay:.45s}
+.banner .val{font-family:var(--display);font-weight:400;font-size:34px;letter-spacing:.01em}
+.banner #caBox .val{font:500 17px/1.2 var(--mono)}
+.banner .val.pop{animation:none}
+.banner .val.pop2{animation:pop .6s var(--ease)}
+
+/* featured $CLAIM: spinning ring + tilt */
+.f-art{transform-style:preserve-3d;transition:transform .3s ease-out}
+.f-art::before{content:'';position:absolute;inset:-8px;border-radius:34px;z-index:-1;
+  background:conic-gradient(from var(--ang,0deg),var(--accent),transparent 30%,#0d0d0d 50%,var(--accent) 70%,transparent 85%,var(--accent));animation:spinRing 4s linear infinite;filter:blur(.5px)}
+@property --ang{syntax:'<angle>';inherits:false;initial-value:0deg}
+@keyframes spinRing{to{--ang:360deg}}
+@media(max-width:640px){.f-art::before{border-radius:28px}}
+.f-body h3{font:400 clamp(44px,6vw,68px)/.95 var(--display);letter-spacing:.01em}
+.feature{transition:border-color .3s,box-shadow .4s}
+.feature:hover{border-color:var(--accent);box-shadow:0 30px 80px -40px rgba(255,212,0,.45)}
+
+/* section headings: big display + word rise */
+.section-h h2,.listhead h2{font:400 clamp(38px,5.4vw,62px)/.95 var(--display);letter-spacing:.005em;text-transform:uppercase}
+.sw{display:inline-block;overflow:hidden;vertical-align:top;padding-bottom:.04em}
+.sw > i{display:inline-block;font-style:normal;transform:translateY(105%);transition:transform .9s cubic-bezier(.2,.9,.2,1);transition-delay:calc(var(--i) * 70ms)}
+.revealed .sw > i{transform:none}
+.eyebrow::before{content:'';display:inline-block;width:0;height:2px;background:var(--accent);vertical-align:middle;margin-right:0;transition:width .7s .2s var(--ease),margin .7s .2s var(--ease)}
+.revealed .eyebrow::before{width:22px;margin-right:10px}
+
+/* steps: connector line + icons draw in */
+.steps{position:relative}
+.steps::before,.steps::after{content:'';position:absolute;left:50px;right:50px;top:50px;height:2px;z-index:0;pointer-events:none}
+.steps::before{background:repeating-linear-gradient(90deg,var(--line2) 0 8px,transparent 8px 16px)}
+.steps::after{background:var(--accent);transform:scaleX(0);transform-origin:0 50%;transition:transform 1.6s .3s cubic-bezier(.6,0,.2,1);box-shadow:0 0 12px rgba(255,212,0,.6)}
+.steps.revealed::after{transform:scaleX(1)}
+@media(max-width:820px){.steps::before,.steps::after{display:none}}
+.step{z-index:1}
+.step .ico{position:relative;transition:transform .5s cubic-bezier(.4,1.8,.5,1),background .3s,color .3s}
+.step:hover .ico{transform:rotate(-8deg) scale(1.1);background:var(--accent);color:var(--accent-ink)}
+.step .ico svg *{stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset 1.3s .25s cubic-bezier(.6,0,.2,1)}
+.step.revealed .ico svg *{stroke-dashoffset:0}
+.step .n{font:400 46px/1 var(--display);color:transparent;-webkit-text-stroke:1px var(--line2);position:absolute;right:20px;top:18px;transition:-webkit-text-stroke-color .3s,color .3s}
+.step:hover .n{-webkit-text-stroke-color:var(--accent)}
+.step:hover{border-color:rgba(255,212,0,.45)}
+
+/* coin cards: lift with tilt */
+.coin{transform-style:preserve-3d}
+.coin:hover{border-color:rgba(255,212,0,.45)}
+.coin:hover .thumb{animation:wiggle .6s ease}
+
+/* FAQ smooth open */
+.faq details{transition:border-color .2s,background .2s}
+.faq details:hover{border-color:var(--line2)}
+.faq details[open]{background:var(--card2);border-color:rgba(255,212,0,.4)}
+.faq .ans{display:grid;grid-template-rows:0fr;transition:grid-template-rows .45s var(--ease)}
+.faq .ans > p{overflow:hidden;min-height:0;animation:none}
+.faq details[open]:not(.closing):not(.pre) .ans{grid-template-rows:1fr}
+
+.launch-head h2{font:400 clamp(44px,6vw,72px)/.95 var(--display);text-transform:uppercase;letter-spacing:.005em}
+
+/* closing CTA */
+.cta{position:relative;margin:72px 0 8px;border-radius:24px;overflow:hidden;background:var(--accent);color:#0d0d0d;padding:0 0 40px;isolation:isolate}
+.cta::before{content:'';position:absolute;inset:0;z-index:-1;opacity:.09;
+  background:repeating-linear-gradient(-45deg,#000 0 2px,transparent 2px 14px)}
+.cta-marquee{overflow:hidden;border-bottom:3px solid #0d0d0d;padding:18px 0 10px;margin-bottom:34px}
+.cta-track{display:flex;width:max-content;animation:marq 28s linear infinite}
+.cta-track span{font:400 clamp(70px,11vw,150px)/.9 var(--display);text-transform:uppercase;padding:0 28px;color:#0d0d0d;white-space:nowrap}
+.cta-track span:nth-child(even){color:transparent;-webkit-text-stroke:2px #0d0d0d}
+.cta-body{display:flex;align-items:end;justify-content:space-between;gap:24px;flex-wrap:wrap;padding:0 34px}
+.cta-body h2{margin:0;font:600 clamp(24px,3.2vw,34px)/1.15 var(--sans);letter-spacing:-.03em;max-width:560px}
+.cta-body p{margin:8px 0 0;color:#3d3500;max-width:520px}
+.cta .btns{margin:0}
+.cta button{background:#0d0d0d;color:var(--accent);min-height:54px;padding:0 28px;font-size:16px}
+.cta button:hover:not(:disabled){background:#000;box-shadow:0 14px 30px -12px rgba(0,0,0,.6)}
+.cta .btn-a.ghosty{color:#0d0d0d;border-color:#0d0d0d;min-height:54px}
+.cta .btn-a.ghosty:hover{background:rgba(0,0,0,.08);border-color:#0d0d0d}
+@media(max-width:640px){.cta-body{padding:0 20px}.cta{border-radius:18px}}
+
+/* reveal variants */
+.reveal{transform:translateY(34px) scale(.985);filter:blur(4px);transition:opacity .9s var(--ease),transform .9s var(--ease),filter .9s var(--ease)}
+.reveal.revealed{filter:none}
+
+/* status console + footer polish */
+.foot{border-top:0;position:relative}
+.foot::before{content:'';position:absolute;left:0;right:0;top:0;height:6px;background:repeating-linear-gradient(-45deg,var(--accent) 0 10px,#0d0d0d 10px 20px);border-radius:3px;opacity:.85}
+
 @media (prefers-reduced-motion:reduce){
+  .tape-track,.cta-track,.f-art::before,.ticket-ghost{animation:none !important}
+  .hero-h .w,.sw > i{transform:none !important}
+  .scrib path,.step .ico svg *{stroke-dashoffset:0 !important}
+  .reveal{filter:none}
+  #cursorGlow{display:none}
   *,*::before,*::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}
   .hero-h .w{opacity:1;transform:none}
   .reveal{opacity:1;transform:none}
@@ -447,6 +621,8 @@ pre.snip{background:var(--field);border:1px solid var(--line2);border-radius:var
 <div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
 <div class="grain" aria-hidden="true"></div>
 <div id="stamp"><div></div></div>
+<div id="progress" aria-hidden="true"></div>
+<div id="cursorGlow" aria-hidden="true"></div>
 <div class="wrap">
   <header class="topbar">
     <div class="brand">
@@ -471,7 +647,7 @@ pre.snip{background:var(--field);border:1px solid var(--line2);border-radius:var
         <div class="kicker"><i></i>Memecoins go to zero. Holders shouldn't.</div>
         <h2 class="hero-h">
           <span class="l1"><span class="w" style="animation-delay:.05s">Rugged?</span></span>
-          <span class="l2"><span class="w" style="animation-delay:.2s">File&nbsp;a</span> <span class="w" style="animation-delay:.32s">claim.</span></span>
+          <span class="l2"><span class="w" style="animation-delay:.2s">File&nbsp;a</span> <span class="w" style="animation-delay:.32s">claim.</span><svg class="scrib" viewBox="0 0 600 30" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d="M4 20 C120 6 260 4 380 12 S560 26 596 10"/></svg></span>
         </h2>
         <p class="lede">The launchpad where coins can carry <b>1–5% insurance</b>. That cut of every trade goes into a pool that pays holders who are down, up to break-even.</p>
         <div class="btns"><button id="heroFile">File a coin</button><button class="ghost" id="heroInsured">Browse insured coins</button></div>
@@ -488,6 +664,7 @@ pre.snip{background:var(--field);border:1px solid var(--line2);border-radius:var
           <span><b>●</b> Bigger losses first</span>
           <span><b>●</b> Never past break-even</span>
         </div>
+        <div class="ticket-ghost g2"></div><div class="ticket-ghost g1"></div>
         <div class="ticket">
           <div class="t-top"><span>Claim form</span><b>#0412</b></div>
           <div class="t-title">Insurance payout</div>
@@ -495,14 +672,19 @@ pre.snip{background:var(--field);border:1px solid var(--line2);border-radius:var
           <div class="t-stamp">PAID</div>
           <div class="t-cut"></div>
           <div class="t-row"><span>Holder</span><b>7xQf…9aKd</b></div>
-          <div class="t-row"><span>Position</span><b class="neg">−62.4%</b></div>
-          <div class="t-row"><span>SOL lost</span><b class="neg">1.840</b></div>
+          <div class="t-row"><span>Position</span><b class="neg" data-count="-62.4" data-fmt="pct">−62.4%</b></div>
+          <div class="t-row"><span>SOL lost</span><b class="neg" data-count="1.840" data-fmt="sol">1.840</b></div>
           <div class="t-row"><span>Covered back to</span><b class="pos">break-even</b></div>
           <div class="t-bar"><i></i></div>
           <div class="t-foot"><span>loss</span><span>break-even</span></div>
         </div>
         <div class="t-label">Example claim · illustration</div>
       </div>
+    </div>
+
+    <div class="tape" aria-hidden="true">
+      <div class="tape-row b"><div class="tape-track"><span>Rugged? File a claim</span><span>Paid in SOL</span><span>Capped at break-even</span><span>1–5% coverage</span><span>Bigger losses paid first</span><span>$CLAIM buyback & burn</span><span>Rugged? File a claim</span><span>Paid in SOL</span><span>Capped at break-even</span><span>1–5% coverage</span><span>Bigger losses paid first</span><span>$CLAIM buyback & burn</span></div></div>
+      <div class="tape-row a"><div class="tape-track"><span>Rugged? File a claim</span><span>Paid in SOL</span><span>Capped at break-even</span><span>1–5% coverage</span><span>Bigger losses paid first</span><span>$CLAIM buyback & burn</span><span>Rugged? File a claim</span><span>Paid in SOL</span><span>Capped at break-even</span><span>1–5% coverage</span><span>Bigger losses paid first</span><span>$CLAIM buyback & burn</span></div></div>
     </div>
 
     <div class="banner reveal">
@@ -554,7 +736,7 @@ pre.snip{background:var(--field);border:1px solid var(--line2);border-radius:var
       <div><span class="eyebrow">How a claim works</span><h2>Three steps from rug to refund</h2></div>
       <p>Coverage is set when a coin launches and can't be removed later, so buyers know exactly what they're getting.</p>
     </div>
-    <div class="steps">
+    <div class="steps watch">
       <div class="step reveal">
         <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/></svg></div>
         <span class="n">01</span><h4>Creator files a coin</h4><p>Pick a name, an image and 1–5% coverage. Launches on a pump.fun-style bonding curve.</p>
@@ -594,12 +776,20 @@ pre.snip{background:var(--field);border:1px solid var(--line2);border-radius:var
       <div><span class="eyebrow">Questions</span><h2>Before you file</h2></div>
     </div>
     <div class="faq reveal">
-      <details><summary>Who gets paid from the insurance pool?</summary><p>Holders of an insured coin who are currently down on it. Each payout stops at break-even, and earlier payouts for the same coin are subtracted, so nobody gets paid twice for one loss.</p></details>
-      <details><summary>Can someone fake a loss to get paid?</summary><p>Tokens a wallet received by transfer count as free, so moving tokens between wallets doesn't create a loss. Payouts can also require a minimum holding time and a minimum loss.</p></details>
-      <details><summary>Where does each trading fee go?</summary><p>A platform fee, a share that buys back and burns $CLAIM, the coin's insurance %, and Meteora's protocol cut. The exact split for your coverage level shows on the filing page before you launch.</p></details>
-      <details><summary>What happens when a coin graduates?</summary><p>When the bonding curve fills, the coin moves to a Meteora pool and trades on Jupiter from then on, just like a pump.fun coin graduating.</p></details>
-      <details><summary>Can coverage be changed after launch?</summary><p>No. The coverage level is locked in when the coin is filed, so holders always know what they bought into.</p></details>
+      <details><summary>Who gets paid from the insurance pool?</summary><div class="ans"><p>Holders of an insured coin who are currently down on it. Each payout stops at break-even, and earlier payouts for the same coin are subtracted, so nobody gets paid twice for one loss.</p></div></details>
+      <details><summary>Can someone fake a loss to get paid?</summary><div class="ans"><p>Tokens a wallet received by transfer count as free, so moving tokens between wallets doesn't create a loss. Payouts can also require a minimum holding time and a minimum loss.</p></div></details>
+      <details><summary>Where does each trading fee go?</summary><div class="ans"><p>A platform fee, a share that buys back and burns $CLAIM, the coin's insurance %, and Meteora's protocol cut. The exact split for your coverage level shows on the filing page before you launch.</p></div></details>
+      <details><summary>What happens when a coin graduates?</summary><div class="ans"><p>When the bonding curve fills, the coin moves to a Meteora pool and trades on Jupiter from then on, just like a pump.fun coin graduating.</p></div></details>
+      <details><summary>Can coverage be changed after launch?</summary><div class="ans"><p>No. The coverage level is locked in when the coin is filed, so holders always know what they bought into.</p></div></details>
     </div>
+
+    <section class="cta reveal" aria-label="File a coin on claim">
+      <div class="cta-marquee" aria-hidden="true"><div class="cta-track"><span>File a claim</span><span>Get covered</span><span>File a claim</span><span>Get covered</span><span>File a claim</span><span>Get covered</span><span>File a claim</span><span>Get covered</span><span>File a claim</span><span>Get covered</span><span>File a claim</span><span>Get covered</span></div></div>
+      <div class="cta-body">
+        <div><h2>Launch a coin that pays its holders back.</h2><p>Pick 1–5% coverage when you file. It's locked in for good, and every trade tops up the pool.</p></div>
+        <div class="btns"><button id="ctaFile" type="button">File a coin</button><a class="btn-a ghosty" href="https://x.com/claim_insure" target="_blank" rel="noopener">Follow @claim_insure</a></div>
+      </div>
+    </section>
   </section>
 
   <!-- LAUNCH -->
@@ -1860,7 +2050,7 @@ const m = location.hash.match(/coin=([1-9A-HJ-NP-Za-km-z]{32,44})/); if (m) open
     // rising dust
     dust.forEach(d => {
       d.y -= d.v * dt; if (d.y < -4){ d.y = H + 4; d.x = rnd(0, W); }
-      ctx.fillStyle = `rgba(124,240,216,${d.a * .5})`; ctx.beginPath(); ctx.arc(d.x, d.y, d.r, 0, 6.283); ctx.fill();
+      ctx.fillStyle = `rgba(255,212,0,${d.a * .45})`; ctx.beginPath(); ctx.arc(d.x, d.y, d.r, 0, 6.283); ctx.fill();
     });
     if (running && !reduce) requestAnimationFrame(draw);
   }
@@ -1937,6 +2127,174 @@ const m = location.hash.match(/coin=([1-9A-HJ-NP-Za-km-z]{32,44})/); if (m) open
 
   /* ---- scroll to top when switching views ---- */
   document.querySelectorAll('nav button, #heroFile').forEach(b => b.addEventListener('click', () => scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' })));
+})();
+</script>
+
+<script>
+/* ===== v3 motion layer ===== */
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const fine = matchMedia('(pointer:fine)').matches;
+  const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+
+  /* scroll progress */
+  const bar = $('#progress');
+  const onScroll = () => {
+    const h = document.documentElement.scrollHeight - innerHeight;
+    bar.style.transform = `scaleX(${h > 0 ? Math.min(1, scrollY / h) : 0})`;
+  };
+  addEventListener('scroll', onScroll, { passive: true }); onScroll();
+
+  /* pointer glow */
+  if (fine && !reduce){
+    const g = $('#cursorGlow'); let gx = -999, gy = -999, tx = -999, ty = -999, on = false;
+    addEventListener('pointermove', e => { tx = e.clientX; ty = e.clientY; if (!on){ on = true; document.body.classList.add('glow-on'); gx = tx; gy = ty; } }, { passive: true });
+    document.addEventListener('pointerleave', () => { on = false; document.body.classList.remove('glow-on'); });
+    (function loop(){ gx += (tx - gx) * .12; gy += (ty - gy) * .12; g.style.transform = `translate3d(${gx}px,${gy}px,0)`; requestAnimationFrame(loop); })();
+  }
+
+  /* sliding nav pill */
+  const nav = $('nav'), pill = document.createElement('span');
+  pill.className = 'navpill'; pill.setAttribute('aria-hidden', 'true'); nav.prepend(pill);
+  const place = () => {
+    const on = nav.querySelector('button.on'); if (!on || !on.offsetWidth){ pill.style.width = '0'; return; }
+    pill.style.width = on.offsetWidth + 'px'; pill.style.transform = `translateX(${on.offsetLeft}px)`;
+  };
+  new MutationObserver(place).observe(nav, { subtree: true, attributes: true, attributeFilter: ['class', 'hidden'] });
+  addEventListener('resize', place); document.fonts && document.fonts.ready.then(place); place();
+
+  /* closing CTA → launch view */
+  const cf = $('#ctaFile'); if (cf) cf.addEventListener('click', () => { showView('launch'); scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' }); });
+
+  /* split section headings into rising words */
+  $$('.section-h h2, .listhead h2').forEach(h => {
+    let i = 0;
+    [...h.childNodes].forEach(n => {
+      if (n.nodeType !== 3 || !n.textContent.trim()) return;
+      const frag = document.createDocumentFragment();
+      n.textContent.split(/(\s+)/).forEach(part => {
+        if (!part) return;
+        if (/^\s+$/.test(part)){ frag.append(part); return; }
+        const o = document.createElement('span'); o.className = 'sw';
+        const w = document.createElement('i'); w.style.setProperty('--i', i++); w.textContent = part;
+        o.append(w); frag.append(o);
+      });
+      n.replaceWith(frag);
+    });
+  });
+  const lh = $('.listhead'); if (lh) lh.classList.add('watch');
+
+  /* observe extra blocks for the "revealed" state */
+  const io = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.forEach(e => {
+    if (e.isIntersecting){ e.target.classList.add('revealed'); io.unobserve(e.target); }
+  }), { threshold: .15 }) : null;
+  $$('.watch').forEach(el => io ? io.observe(el) : el.classList.add('revealed'));
+
+  /* banner numbers count up when live data lands */
+  if (!reduce) $$('.banner .val').forEach(el => {
+    if (el.closest('#caBox')) return;
+    let mine = null, raf = 0;
+    new MutationObserver(() => {
+      const txt = el.textContent;
+      if (txt === mine) return;                          // our own frame
+      const m = txt.match(/^([^\d-]*)(-?[\d,]*\.?\d+)(.*)$/); if (!m) return;
+      const end = parseFloat(m[2].replace(/,/g, '')); if (!isFinite(end) || end === 0) return;
+      const dec = (m[2].split('.')[1] || '').length, comma = m[2].includes(','), t0 = performance.now();
+      const fmt = v => m[1] + (comma ? v.toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec }) : v.toFixed(dec)) + m[3];
+      cancelAnimationFrame(raf);
+      (function step(t){
+        const p = Math.min(1, (t - t0) / 900), e = 1 - Math.pow(1 - p, 3);
+        mine = p < 1 ? fmt(end * e) : txt; el.textContent = mine;
+        if (p < 1) raf = requestAnimationFrame(step);
+        else { el.classList.remove('pop2'); void el.offsetWidth; el.classList.add('pop2'); }
+      })(t0);
+    }).observe(el, { childList: true, characterData: true, subtree: true });
+  });
+
+  /* ticket: numbers tick down + confetti when PAID lands */
+  const stage = $('.ticket-stage'), tk = $('.ticket'), st = $('.t-stamp');
+  if (stage && tk && st && !reduce){
+    const nums = $$('.ticket [data-count]');
+    const show = p => nums.forEach(n => {
+      const v = parseFloat(n.dataset.count) * p;
+      n.textContent = n.dataset.fmt === 'pct' ? '−' + Math.abs(v).toFixed(1) + '%' : Math.abs(v).toFixed(3);
+    });
+    const cycle = () => {
+      const t0 = performance.now();
+      (function run(t){ const p = Math.min(1, (t - t0) / 1600); show(1 - Math.pow(1 - p, 3)); if (p < 1) requestAnimationFrame(run); })(t0);
+      setTimeout(burst, 3500);
+    };
+    const burst = () => {
+      if (document.hidden) return;
+      tk.classList.remove('thud'); void tk.offsetWidth; tk.classList.add('thud');
+      const r = stage.getBoundingClientRect(), s = st.getBoundingClientRect();
+      const cx = s.left - r.left + s.width / 2, cy = s.top - r.top + s.height / 2;
+      const cols = ['#ffd400', '#0d0d0d', '#f5f5f0', '#ffe24d'];
+      for (let i = 0; i < 26; i++){
+        const c = document.createElement('i'), a = Math.random() * 6.283, d = 70 + Math.random() * 130;
+        c.className = 'confetto';
+        c.style.cssText = `--x:${cx}px;--y:${cy}px;--s:${6 + Math.random() * 7}px;--c:${cols[i % 4]};--dx:${Math.cos(a) * d}px;--dy:${Math.sin(a) * d + 60}px;--r:${(Math.random() * 720 - 360) | 0}deg`;
+        stage.append(c); setTimeout(() => c.remove(), 1500);
+      }
+    };
+    st.addEventListener('animationstart', cycle);
+    st.addEventListener('animationiteration', cycle);
+  }
+
+  /* magnetic primary buttons */
+  if (fine && !reduce) $$('.hero .btns button, .btn-a, .cta button').forEach(b => {
+    b.classList.add('mag');
+    b.addEventListener('pointermove', e => {
+      const r = b.getBoundingClientRect(), x = e.clientX - r.left - r.width / 2, y = e.clientY - r.top - r.height / 2;
+      b.style.transform = `translate(${x * .18}px,${y * .3}px)`;
+    });
+    b.addEventListener('pointerleave', () => { b.style.transform = ''; });
+  });
+
+  /* tilt: featured logo + coin cards */
+  if (fine && !reduce){
+    const fe = $('#claimFeature'), art = $('.f-art');
+    if (fe && art){
+      fe.addEventListener('pointermove', e => {
+        const r = fe.getBoundingClientRect(), px = (e.clientX - r.left) / r.width - .5, py = (e.clientY - r.top) / r.height - .5;
+        art.style.transform = `perspective(600px) rotateY(${px * 28}deg) rotateX(${-py * 24}deg)`;
+      });
+      fe.addEventListener('pointerleave', () => { art.style.transform = ''; });
+    }
+    const grid = $('#coinGrid');
+    grid.addEventListener('pointermove', e => {
+      const c = e.target.closest('.coin'); if (!c) return;
+      const r = c.getBoundingClientRect(), px = (e.clientX - r.left) / r.width - .5, py = (e.clientY - r.top) / r.height - .5;
+      c.style.transform = `perspective(700px) translateY(-4px) rotateX(${-py * 6}deg) rotateY(${px * 8}deg)`;
+    });
+    grid.addEventListener('pointerout', e => { const c = e.target.closest('.coin'); if (c && !c.contains(e.relatedTarget)) c.style.transform = ''; });
+  }
+
+  /* FAQ: animate open and close */
+  $$('.faq details').forEach(d => {
+    const sum = d.querySelector('summary'), ans = d.querySelector('.ans'); if (!ans) return;
+    sum.addEventListener('click', e => {
+      if (reduce) return;
+      e.preventDefault();
+      if (d.open){
+        d.classList.add('closing');
+        setTimeout(() => { d.open = false; d.classList.remove('closing'); }, 420);
+      } else {
+        d.classList.add('pre'); d.open = true;
+        requestAnimationFrame(() => requestAnimationFrame(() => d.classList.remove('pre')));
+      }
+    });
+  });
+
+  /* parallax: orbit chips + ghost tickets drift on scroll */
+  if (!reduce){
+    const orbit = $('.orbit'), ghosts = $$('.ticket-ghost');
+    addEventListener('scroll', () => {
+      const y = Math.min(scrollY, 900);
+      if (orbit) orbit.style.transform = `translateY(${y * -.08}px)`;
+      ghosts.forEach((g, i) => g.style.translate = `0 ${y * (i ? .05 : -.04)}px`);
+    }, { passive: true });
+  }
 })();
 </script>
 </body>
