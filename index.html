@@ -333,6 +333,8 @@ code{font-family:var(--mono);font-size:.92em;background:var(--field);padding:1px
 .coin .ph{background:linear-gradient(110deg,var(--field) 30%,var(--card2) 50%,var(--field) 70%);background-size:200% 100%;animation:shim 1.4s linear infinite}
 @keyframes shim{to{background-position:-200% 0}}
 .coin .meta{min-width:0;flex:1}
+a.coin{text-decoration:none;color:inherit}
+.coin.claim-pin{border-color:rgba(255,212,0,.45)}
 .coin .nm{font:600 16px/1.3 var(--sans);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .coin .tk{color:var(--muted);font:400 13px/1.4 var(--mono);margin-top:2px}
 .lp-mark{position:absolute;right:-7px;bottom:-7px;height:22px;min-width:22px;border-radius:99px;border:2px solid var(--card);background:var(--card2);color:var(--soft);font:500 11px/18px var(--mono);padding:0 6px;text-transform:lowercase;object-fit:cover}
@@ -1209,10 +1211,13 @@ async function loadCoins(){
     all.sort((a, b) => b.mcap - a.mcap);
     coins = all;   // every coin (Admin still sees hidden ones)
     const shownCoins = all.filter(isShown);
-    $('bnCoins').textContent = shownCoins.length.toLocaleString();
+    $('bnCoins').textContent = (shownCoins.length + ((SITE.CLAIM_MINT || '').trim() ? 1 : 0)).toLocaleString();
     $('bnIns').textContent = shownCoins.filter(c => c.ins > 0).length.toLocaleString();
     renderGrid();
-  } catch(e){ $('coinGrid').innerHTML = `<div class="empty">Couldn't load coins: ${esc(e.message)}<br>Make sure SITE.RPC_URL is a Helius/QuickNode URL.</div>`; }
+  } catch(e){
+    if (claimCard()){ renderGrid(); return; }   // still show $CLAIM if the coin list can't load
+    $('coinGrid').innerHTML = `<div class="empty">Couldn't load coins: ${esc(e.message)}<br>Make sure SITE.RPC_URL is a Helius/QuickNode URL.</div>`;
+  }
 }
 let gridFilter = 'all';
 const FILTERS = {
@@ -1228,14 +1233,31 @@ document.querySelectorAll('.filters [data-filter]').forEach(b => b.onclick = () 
 });
 $('heroInsured').onclick = () => { document.querySelector('.filters [data-filter=insured]').click(); document.querySelector('.listhead').scrollIntoView({ behavior: 'smooth' }); };
 function isShown(c){ const h = SITE.HIDDEN_COINS || []; return !(h.includes(c.mint) || h.includes('$' + (c.meta?.symbol || '').replace(/\0/g,'').trim())); }
+// $CLAIM (the pump.fun coin) pinned first in the coin list whenever SITE.CLAIM_MINT is set.
+function claimCard(){
+  const mint = (SITE.CLAIM_MINT || '').trim(); if (!mint) return '';
+  const url = mint.endsWith('pump') ? `https://pump.fun/coin/${mint}` : `https://jup.ag/swap/SOL-${mint}`;
+  return `
+    <a class="coin claim-pin" href="${esc(url)}" target="_blank" rel="noopener">
+      <div class="thumb"><img src="claim-pfp.png" alt="$${esc(SITE.CLAIM_TICKER)} logo"></div>
+      <div class="meta">
+        <div class="nm">$${esc(SITE.CLAIM_TICKER)}</div>
+        <div class="tk">live on pump.fun</div>
+        <span class="badge">Coin #1</span> <span class="badge grad">buyback &amp; burn</span>
+        <div class="small-stat" style="margin-top:10px">${esc(mint.slice(0, 6))}…${esc(mint.slice(-6))} · Trade on pump.fun ↗</div>
+      </div>
+    </a>`;
+}
 function renderGrid(){
-  const total = coins.filter(isShown).length;
+  const pin = claimCard();
+  const total = coins.filter(isShown).length + (pin ? 1 : 0);
   if (!total){ $('coinGrid').innerHTML = '<div class="empty">No coins yet. Be the first to file one.</div>'; $('coinCount').textContent = ''; return; }
+  const showPin = pin && gridFilter === 'all';
   const shown = coins.map((c, i) => [c, i]).filter(([c]) => isShown(c) && FILTERS[gridFilter](c));
   if (gridFilter === 'new') shown.sort((a, b) => a[0].progress - b[0].progress);
-  $('coinCount').textContent = `Showing ${shown.length} of ${total} coin${total === 1 ? '' : 's'}`;
-  if (!shown.length){ $('coinGrid').innerHTML = '<div class="empty">Nothing here yet.</div>'; return; }
-  $('coinGrid').innerHTML = shown.map(([c, i]) => `
+  $('coinCount').textContent = `Showing ${shown.length + (showPin ? 1 : 0)} of ${total} coin${total === 1 ? '' : 's'}`;
+  if (!shown.length && !showPin){ $('coinGrid').innerHTML = '<div class="empty">Nothing here yet.</div>'; return; }
+  $('coinGrid').innerHTML = (showPin ? pin : '') + shown.map(([c, i]) => `
     <div class="coin" data-i="${i}">
       <div class="thumb"><div class="ph" data-img="${i}"></div>${lpMark(c.ins)}</div>
       <div class="meta">
@@ -1246,7 +1268,7 @@ function renderGrid(){
         <div class="small-stat">${(c.progress * 100).toFixed(1)}% to graduation</div>
       </div>
     </div>`).join('');
-  document.querySelectorAll('.coin').forEach(el => el.onclick = () => openCoin(coins[el.dataset.i].address));
+  document.querySelectorAll('.coin[data-i]').forEach(el => el.onclick = () => openCoin(coins[el.dataset.i].address));
   shown.forEach(async ([c, i]) => {
     const j = await fetchJson(c.meta.uri); c.json = j;
     const holder = document.querySelector(`[data-img="${i}"]`);
